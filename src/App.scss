@@ -1,0 +1,50 @@
+.layout {
+  display: flex;
+  transition: filter 0.3s ease-in-out;
+  position: relative;
+}
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+}
+
+.child-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.child {
+  width: 250px;
+  height: 150px;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 11;
+
+  button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darkred;
+    }
+  }
+}

@@ -1,0 +1,69 @@
+@import "../../style.scss";
+
+.input {
+  @include themify($themes) {
+    display: flex;
+    padding-left: 1px;
+    flex-direction: column;
+    background-color: themed("bgSoft");
+    border-radius: 5px;
+    gap: 5px;
+    position: fixed;
+    top: 65%;
+    font-size: 25px;
+    left: 12%;
+    transform: translate(-50%, -50%);
+    width: 40vh;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    padding: 20px;
+
+    .value {
+        background-color: transparent;
+        border: none;
+        padding: 10px;
+        color: themed("textColor");
+        display: flex;
+        position: relative;
+        gap: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      
+      .value:not(:active):hover,
+      .value:focus {
+        background-color: themed("bgSoft");
+      }
+      
+      .value:focus,
+      .value:active {
+        background-color: themed("bgSoft");
+        outline: none;
+      }
+      
+      .value::before {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: -10px;
+        width: 5px;
+        height: 80%;
+        background-color: #2F81F7;
+        border-radius: 5px;
+        opacity: 0;
+      }
+      
+      .value:focus::before,
+      .value:active::before {
+        opacity: 1;
+      }
+      
+      .value svg {
+        width: 15px
+      }
+  }
+}

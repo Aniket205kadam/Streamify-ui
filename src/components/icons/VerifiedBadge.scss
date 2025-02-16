@@ -1,0 +1,22 @@
+.verified-badge {
+    position: relative;
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+
+    .badge-bg {
+        color: #0095f6;
+        font-size: 22px;
+      }
+      
+      .badge-check {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+}
+  

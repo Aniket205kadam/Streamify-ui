@@ -1,0 +1,165 @@
+@import "../../style.scss";
+
+.leftBar {
+  @include themify($themes) {
+    flex: 2;
+    position: sticky;
+    top: 0;
+    overflow: scroll;
+    height: 100vh; 
+    width: 250px;
+    height: 100vh;
+    background-color: themed("bg");
+    color: themed("textColor");
+    border-right: 1px solid #dbdbdb;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  
+    .container {
+      padding: 20px;
+
+      .app-heading {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-left: px;
+        font-size: 30px;
+      }
+  
+      hr {
+        margin: 20px 0;
+        border: none;
+        height: 1px;
+        background-color: #dbdbdb;
+      }
+  
+      .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+  
+        .item {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          font-size: 15px;
+          font-weight: 400;
+          cursor: pointer;
+          padding: 10px;
+          border-radius: 10px;
+          transition: background-color 0.3s ease-in-out;
+  
+          svg {
+            font-size: 23px;
+          }
+  
+          &:hover {
+            background-color: themed("hover");
+          }
+        }
+  
+        .user {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px;
+          cursor: pointer;
+          transition: all 0.3s ease-in-out;
+  
+          img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid themed("border");
+          }
+  
+          span {
+            font-size: 15px;
+            font-weight: 400;
+            font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+            color: themed("textColor");
+          }
+  
+          &:hover {
+            background-color: themed("hover");
+            border-radius: 10px;
+          }
+        }
+      }
+
+      .second-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-top: 80px;
+        
+        .item {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          font-size: 15px;
+          font-weight: 400;
+          cursor: pointer;
+          padding: 10px;
+          border-radius: 10px;
+          transition: background-color 0.3s ease-in-out;
+  
+          svg {
+            font-size: 23px;
+          }
+  
+          &:hover {
+            background-color: themed("hover");
+          }
+        }
+      }
+
+      .popup-overplay {
+        display: flex;
+
+        .popup {
+
+          ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: themed("bgSoft");
+            
+            li {
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              padding: 12px 15px;
+              font-size: 14px;
+              cursor: pointer;
+
+              .logout {
+                color: red;
+                font-weight: bold;
+              }
+
+              div {
+                
+                span {
+                  padding-left: 10px;
+                  font-size: 15px;
+                }
+
+                svg {
+                  padding-left: 20px;
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }      
+  }
+  }
+  

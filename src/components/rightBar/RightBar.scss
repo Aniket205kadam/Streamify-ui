@@ -1,0 +1,155 @@
+@import "../../style.scss";
+
+.rightBar {
+  @include themify($themes) {
+    flex: 3;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: themed("bg");
+    color: themed("textColor");
+
+    .blurred {
+      // filter: blur(5px);
+      background-color: red;
+    }
+  
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+  
+      .connected-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 15px;
+  
+        img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+  
+        .user-info {
+          display: flex;
+          flex-direction: column;
+  
+          .username {
+            font-weight: 600;
+          }
+  
+          .fullName {
+            font-size: 14px;
+            color: gray;
+          }
+        }
+      }
+  
+      .suggested-users {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+  
+        .header {
+          display: flex;
+          justify-content: space-between;
+          font-size: 14px;
+          color: gray;
+  
+          .see-all {
+            text-decoration: none;
+            color: #0095f6;
+            font-weight: 600;
+          }
+        }
+  
+        .user {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 10px;
+          transition: all 0.2s ease-in-out;
+  
+          &:hover {
+            background-color: themed("hover");
+            border-radius: 10px;
+          }
+  
+          .userInfo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+  
+            img {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+
+            .profile {
+                text-decoration: none;
+                font-weight: 600;
+                color: themed("textColor");
+            }
+  
+            .username {
+              font-weight: 600;
+            }
+  
+            .followedBy {
+              font-size: 12px;
+              color: gray;
+            }
+          }
+  
+          .follow-btn {
+            border: none;
+            background-color: #0095f6;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+  
+            &:hover {
+              background-color: #0077cc;
+            }
+          }
+        }
+      }
+    }
+    .rightBar-footer {
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 12px;
+        color: #b0b0b0;
+        text-align: center;
+        
+        .info {
+            text-decoration: none;
+            color: #b0b0b0;
+            padding-right: 0.5%;
+        }
+
+        .info:hover {
+            color: themed("textColor");
+        }
+
+        p {
+          margin: 5px 0;
+        }
+    }
+  }
+}

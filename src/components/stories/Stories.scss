@@ -1,0 +1,148 @@
+@import "../../style.scss";
+
+.stories-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+}
+
+.stories {
+    @include themify($themes) {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    flex: 1;
+    padding: 10px;
+
+    .user-story {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+
+        img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-fit: cover;
+        }
+
+        span {
+            margin-top: 5px;
+            font-size: 12px;
+            color: themed("textColor");
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .add-story-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 5px;
+            background-color: #5271ff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+      
+  }
+}
+}
+
+.stories::-webkit-scrollbar {
+  display: none;
+}
+
+.story {
+    @include themify($themes) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+
+        .profile-border {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(
+            45deg,
+            #f09433,
+            #e6683c,
+            #dc2743,
+            #cc2366,
+            #bc1888
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            }
+        }
+
+        span {
+            margin-top: 5px;
+            font-size: 12px;
+            color: themed("textColor");
+            font-weight: 500;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        &.seen .profile-border {
+            background: #bbb;
+        }
+    }
+}
+
+.scroll-btn {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 18px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.scroll-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.left {
+  left: -30px;
+}
+
+.right {
+  right: -30px;
+}

@@ -1,0 +1,164 @@
+@import "../../style.scss";
+
+.search-page {
+  @include themify($themes) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background: themed("bgSoft");
+    position: fixed;
+    top: 50%;
+    left: 42%;
+    transform: translate(-50%, -50%);
+    width: 80vh; 
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    z-index: 10;
+    padding: 20px;
+
+    .search {
+      width: 100%;
+      height: 100%;
+      background: themed("bgSoft");
+      color: themed("textColor");
+      border-radius: 12px;
+      padding: 14px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+
+      overflow-y: auto; 
+      max-height: 100%; 
+      scrollbar-width: thin;
+      scrollbar-color: themed("textColorSoft") transparent;
+
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: themed("textColorSoft");
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 20px;
+        margin-bottom: 12px;
+        color: themed("textColor");
+        text-align: center;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: themed("bg");
+        padding: 10px 14px;
+        border-radius: 30px;
+        border: 1px solid themed("bgSoft");
+        margin-bottom: 10px;
+        width: 100%;
+
+        input {
+          flex: 1;
+          background: transparent;
+          border: none;
+          outline: none;
+          color: themed("textColorSoft");
+          font-size: 16px;
+          padding: 8px;
+
+          &::placeholder {
+            color: themed("textColorSoft");
+          }
+        }
+
+        button {
+          background: transparent;
+          border: none;
+          color: themed("textColor");
+          cursor: pointer;
+          font-size: 18px;
+        }
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid themed("textColorSoft");
+        margin: 12px 0;
+        width: 100%;
+      }
+
+      .recent {
+        .msg {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 15px;
+        }
+      }
+
+      .recent,
+      .searched-users {
+        width: 100%; 
+        padding: 10px;
+        overflow-y: auto;
+        max-height: 50vh;
+
+        h2 {
+          font-size: 16px;
+          margin-bottom: 8px;
+          color: themed("textColor");
+          text-align: left;
+        }
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          padding: 10px;
+          gap: 12px;
+          transition: background 0.2s ease-in-out;
+          border-radius: 8px;
+          cursor: pointer;
+          width: 100%;
+
+          &:hover {
+            background: themed("hover");
+          }
+
+          .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+
+          .details {
+            flex: 1;
+
+            .username {
+              font-weight: bold;
+              color: themed("textColor");
+            }
+
+            .info {
+              font-size: 14px;
+              color: themed("textColorSoft");
+            }
+          }
+
+          .recent-delete button {
+            background: transparent;
+            border: none;
+            color: themed("textColor");
+            cursor: pointer;
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}
