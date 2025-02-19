@@ -1,0 +1,121 @@
+.story-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
+    color: #fff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  
+    .main {
+      position: relative;
+      width: 375px; // Standard mobile width
+      height: 667px; // Standard mobile height
+      background-color: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  
+      .header {
+        position: absolute;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+        z-index: 10;
+  
+        .user-info {
+          display: flex;
+          align-items: center;
+  
+          img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #fff;
+          }
+  
+          span {
+            font-size: 14px;
+            margin-right: 10px;
+            color: #fff;
+          }
+        }
+  
+        .actions {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+  
+          .audio,
+          .play-pause,
+          .more {
+            cursor: pointer;
+  
+            svg {
+              width: 20px;
+              height: 20px;
+              color: #fff;
+            }
+          }
+        }
+      }
+  
+      .content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        // z-index: 1; 
+  
+        img,
+        video {
+          width: 1000px;
+          height: 1000px;
+          object-fit: cover;
+        }
+      }
+  
+      .footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+        z-index: 10; // Increased z-index to ensure it's above the content
+  
+        input {
+          flex: 1;
+          padding: 10px;
+          border: none;
+          border-radius: 20px;
+          background-color: rgba(255, 255, 255, 0.1);
+          color: #fff;
+          font-size: 14px;
+          margin-right: 10px;
+          outline: none;
+  
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+          }
+        }
+  
+        .Like {
+          cursor: pointer;
+  
+          svg {
+            width: 24px;
+            height: 24px;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }

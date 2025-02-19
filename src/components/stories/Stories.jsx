@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 
-function Stories() {
+function Stories({ showAddStoryBox }) {
   const storiesRef = useRef(null);
   const navigate = useNavigate();
 
@@ -81,10 +81,10 @@ function Stories() {
       allStoriesSeen: true,
     },
   ];
-  
-  const addStory = () => {
-    alert("This is upcomming feature");
-  }
+
+  // const addStory = () => {
+  //   alert("This is upcomming feature");
+  // }
 
   return (
     <div className="stories-container">
@@ -102,12 +102,15 @@ function Stories() {
             onClick={() => navigate(`/stories/${connectedUser.username}`)}
           />
           <span>{connectedUser.username}</span>
-          <button className="add-story-btn" onClick={addStory}>
+          <button className="add-story-btn" onClick={showAddStoryBox}>
             <FontAwesomeIcon icon={faPlus} />
           </button>
         </div>
         {stories.map((story) => (
-          <Link to={`stories/${story.username}`} style={{ textDecoration: "none", color: "inherit"}}>
+          <Link
+            to={`stories/${story.username}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
             <div
               className={`story ${story.allStoriesSeen ? "seen" : ""}`}
               key={story.id}

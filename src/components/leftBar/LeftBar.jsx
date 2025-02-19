@@ -22,7 +22,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { dark, light } from "../../store/themeSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function LeftBar({ searchHandler, isOpenSearchBox , moreHandler}) {
+function LeftBar({
+  searchHandler,
+  isOpenSearchBox,
+  moreHandler,
+  createPostHandler,
+  isOpenCreatePostBox,
+}) {
   const profileUrl =
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
   const currentUser = {
@@ -55,11 +61,13 @@ function LeftBar({ searchHandler, isOpenSearchBox , moreHandler}) {
     <div className="leftBar">
       <div className="container">
         <div className="app-heading">
-        <h1 className="streamify-logo" style={{fontSize: "40px"}}>Stremify</h1>
+          <h1 className="streamify-logo" style={{ fontSize: "40px" }}>
+            Stremify
+          </h1>
         </div>
         <div className="menu">
           <div className="item" onClick={() => navigate("/")}>
-            {currentLocation.pathname === "/" && !isOpenSearchBox ? (
+            {currentLocation.pathname === "/" && !isOpenSearchBox && !isOpenCreatePostBox ? (
               <>
                 <FontAwesomeIcon icon={faHouse} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Home</span>
@@ -115,7 +123,8 @@ function LeftBar({ searchHandler, isOpenSearchBox , moreHandler}) {
           </div>
 
           <div className="item">
-            {currentLocation.pathname === "/direct/inbox/" && !isOpenSearchBox ? (
+            {currentLocation.pathname === "/direct/inbox/" &&
+            !isOpenSearchBox ? (
               <>
                 <FontAwesomeIcon icon={faMessage} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Messages</span>
@@ -129,7 +138,8 @@ function LeftBar({ searchHandler, isOpenSearchBox , moreHandler}) {
           </div>
 
           <div className="item">
-            {currentLocation.pathname === "/notification" && !isOpenSearchBox ? (
+            {currentLocation.pathname === "/notification" &&
+            !isOpenSearchBox ? (
               <>
                 <FontAwesomeIcon icon={faHeart} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Notifications</span>
@@ -142,8 +152,8 @@ function LeftBar({ searchHandler, isOpenSearchBox , moreHandler}) {
             )}
           </div>
 
-          <div className="item">
-            {currentLocation.pathname === "/create/post" && !isOpenSearchBox ? (
+          <div className="item" onClick={() => createPostHandler(true)}>
+            {isOpenCreatePostBox ? (
               <>
                 <FontAwesomeIcon icon={faSquarePlus} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Create</span>
