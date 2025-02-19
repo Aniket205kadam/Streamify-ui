@@ -4,17 +4,21 @@ import { saveAuthInfo, loadAuthInfo } from "./LocalStorage";
 const initialState = loadAuthInfo() || {
   id: "",
   username: "",
+  identifier: "",
+  isAuthenticated: false,
   authToken: "",
 };
 
 const authenticationSlice = createSlice({
   name: "authentication",
   initialState,
-  reducer: {
+  reducers: {
     login: (state, action) => {
-      state.id = action.playload.id;
-      state.username = action.playload.username;
-      state.authToken = action.playload.authToken;
+      state.id = action.payload.id;
+      state.username = action.payload.username;
+      state.identifier = action.payload.identifier;
+      state.authToken = action.payload.authToken;
+      state.isAuthenticated = action.payload.isAuthenticated;
       saveAuthInfo(state);
     },
 
@@ -22,6 +26,8 @@ const authenticationSlice = createSlice({
       state.id = "";
       state.username = "";
       state.authToken = "";
+      state.identifier = "";
+      state.isAuthenticated = false;
       saveAuthInfo(state);
     },
   },

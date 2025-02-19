@@ -1,0 +1,35 @@
+#info-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    // background-color: #ffcc00;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 18px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    animation: fadeOut 10s forwards;
+}
+
+.success {
+    background-color: #85eb71;
+}
+
+.failed {
+    background-color: #f76f45;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}

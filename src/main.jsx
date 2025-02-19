@@ -15,6 +15,8 @@ import Explore from "./pages/explore/Explore.jsx";
 import Search from "./pages/search/Search.jsx";
 import AddStory from "./components/story/AddStory.jsx";
 import Story from "./components/story/Story.jsx";
+import BirthDate from "./pages/register/BirthDate.jsx";
+import VerificationPage from "./pages/register/VerificationPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +69,22 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/account/verify-birthdate",
+    element: (
+      <ProtectedRoute authentication={false}>
+        <BirthDate />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/account/verify-otp",
+    element: (
+      <ProtectedRoute authentication={false}>
+        <VerificationPage />
+      </ProtectedRoute>
+    )
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

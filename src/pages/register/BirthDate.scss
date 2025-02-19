@@ -88,6 +88,15 @@
               background-color: #0066b3;
             }
           }
+
+          button.disabled {
+            background: #7ac1f0;
+            opacity: 0.6;
+          }
+  
+          button.disabled:hover {
+            cursor: not-allowed;
+          }
         }
       }
 }
