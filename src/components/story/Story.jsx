@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Like from "../icons/Like";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,115 +7,124 @@ import {
   faPlay,
   faCirclePause,
   faEllipsis,
+  faChevronRight,
+  faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import "./Story.scss"
+import "./Story.scss";
+import { useConvertTime } from "../../hooks/useConvertTime";
 
-function Story({ username }) {
-  // using this username we can retive all the story of this user
-  const feakStories = [
-    {
-      id: "1",
-      url: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
-      type: "image/",
-      user: {
-        id: "101",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      createdAt: "2025-02-19T10:00:00Z",
-    },
-    {
-      id: "2",
-      url: "https://images.unsplash.com/photo-1511763368359-4f839f49dd34",
-      type: "image/",
-      user: {
-        id: "101",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      createdAt: "2025-02-19T12:30:00Z",
-    },
-    {
-      id: "3",
-      url: "https://images.unsplash.com/photo-1558981403-c5f9899a28b1",
-      type: "image/",
-      user: {
-        id: "101",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      createdAt: "2025-02-18T18:45:00Z",
-    },
-    {
-      id: "4",
-      url: "https://images.unsplash.com/photo-1563201515-1ec7a7d29a6e",
-      type: "image/",
-      user: {
-        id: "101",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      createdAt: "2025-02-17T09:15:00Z",
-    },
-    {
-      id: "5",
-      url: "https://images.unsplash.com/photo-1533745848184-0dfaf2f4cd9c",
-      type: "image/",
-      user: {
-        id: "101",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      createdAt: "2025-02-16T22:00:00Z",
-    },
-  ];
+function Story({ userStories, isAudio, setIsAudio }) {
+  console.log("username: " + userStories[0].user.username);
+  const [stories, setStories] = useState([]);
+  const [storyIdx, setStoryIdx] = useState(0);
+  const [isPause, setIsPause] = useState(false);
+  const [currStoryTime, setCurrStoryTime] = useState();
+  const [loading, setLoading] = useState(true);
+  const currContentRef = useRef(null);
 
-  const [stories, setStories] = useState(feakStories);
-  const [storyIdx, setStortIdx] = useState(0);
+  const handlePlayPause = () => {
+    if (currContentRef.current) {
+      if (currContentRef.current.paused) {
+        currContentRef.current.play();
+        setIsPause(false);
+      } else {
+        currContentRef.current.pause();
+        setIsPause(true);
+      }
+    }
+  };
 
-  return (
-    <div className="story-container">
-        <div className="main">
-          <div className="header">
+  const scrollLeft = () => {
+    setStoryIdx((prevStoryIdx) => Math.max(prevStoryIdx - 1, 0));
+  };
+
+  const scrollRight = () => {
+    setStoryIdx((prevStoryIdx) => Math.min(prevStoryIdx + 1, stories.length - 1));
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      const time = useConvertTime(stories[storyIdx].createdAt);
+      setCurrStoryTime(time);
+    }
+  }, [storyIdx, stories]);
+
+  useEffect(() => {
+    setStoryIdx(0);
+    setStories(userStories);
+    setLoading(false)
+  }, [userStories]);
+
+  if (loading) {
+    return <div style={{ color: "white" }}>Loading...</div>;
+  } else {
+    return (
+      <div className="story-container">
+        <div className="story-main">
+          <div className="story-header">
             <div className="user-info">
               <img
-                src={stories[0].user.profileUrl}
-                alt={stories[0].user.username + " profile"}
+                src={stories[storyIdx].user.profileUrl}
+                alt={`${stories[storyIdx].user.username} profile`}
               />
-              <span>{stories[0].user.username}</span>
-              <span>{stories[0].createdAt}</span>
+              <span className="username">
+                {stories[storyIdx].user.username}
+              </span>
+              <span className="timestamp">{currStoryTime}</span>
             </div>
             <div className="actions">
-              <div className="audio">
-                <FontAwesomeIcon icon={faVolumeHigh} />
-                {/* <FontAwesomeIcon icon={faVolumeXmark} /> */}
+              <div className="audio" onClick={() => setIsAudio(!isAudio)}>
+                <FontAwesomeIcon
+                  icon={isAudio ? faVolumeHigh : faVolumeXmark}
+                />
               </div>
-              <div className="play-pause">
-                <FontAwesomeIcon icon={faPlay} />
-                {/* <FontAwesomeIcon icon={faCirclePause} /> */}
+              <div className="play-pause" onClick={handlePlayPause}>
+                <FontAwesomeIcon icon={isPause ? faCirclePause : faPlay} />
               </div>
               <div className="more">
                 <FontAwesomeIcon icon={faEllipsis} />
               </div>
             </div>
-            <div className="content">
-                {stories[storyIdx].type.startsWith("image/") ?
-                <img src={stories[storyIdx].url} />
-                :
-                <video src={stories[storyIdx].url} />
-                }
-            </div>
-            <div className="footer">
-              <input
-                type="text"
-                placeholder={`Reply to ${stories[0].user.username}`}
+          </div>
+
+          <div className="story-content">
+            {stories.length > 0 && storyIdx != 0 && (
+              <div className="left" onClick={scrollLeft}>
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </div>
+            )}
+            {stories[storyIdx].type.startsWith("image/") ? (
+              <img
+                src={stories[storyIdx].url}
+                alt={stories[storyIdx].user.username + " story"}
               />
-              <Like />
-            </div>
+            ) : (
+              <video
+                ref={currContentRef}
+                src={stories[storyIdx].url}
+                autoPlay
+                loop
+                muted={!isAudio}
+              />
+            )}
+            {stories.length > 0 && storyIdx != stories.length - 1 && (
+              <div className="right" onClick={scrollRight}>
+                <FontAwesomeIcon icon={faChevronRight} />
+              </div>
+            )}
+          </div>
+
+          <div className="story-footer">
+            <input
+              type="text"
+              placeholder={`Reply to ${stories[storyIdx].user.username}`}
+            />
+            <Like />
           </div>
         </div>
-    </div>
-  );
+      </div>
+    );
+  }
 }
 
 export default Story;

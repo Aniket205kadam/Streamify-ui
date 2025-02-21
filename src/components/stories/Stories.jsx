@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Stories.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,8 +7,14 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
+import useConnectedUser from "../../hooks/useConnectedUser";
+import storyService from "../../services/storyService";
+import ShowInfoBanner from "../popups/ShowInfoBanner";
 
 function Stories({ showAddStoryBox }) {
+  const connectedUser = useConnectedUser();
+  const [error, setError] = useState(false);
+  const [connectedUserHasStory, setConnectedUserHasStory] = useState(false);
   const storiesRef = useRef(null);
   const navigate = useNavigate();
 
@@ -22,12 +28,6 @@ function Stories({ showAddStoryBox }) {
     if (storiesRef.current) {
       storiesRef.current.scrollBy({ left: 200, behavior: "smooth" });
     }
-  };
-
-  const connectedUser = {
-    username: "aniket205kadam",
-    profileUrl:
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
   };
 
   const stories = [
@@ -82,12 +82,22 @@ function Stories({ showAddStoryBox }) {
     },
   ];
 
-  // const addStory = () => {
-  //   alert("This is upcomming feature");
-  // }
+  useEffect(() => {
+    (async function () {
+      setError(false);
+      const { success, error, data } =
+        await storyService.isConnectedUserHasStory(connectedUser.authToken);
+      if (!success) {
+        setError(error);
+        return;
+      }
+      setConnectedUserHasStory(data === "true" ? true : false);
+    })();
+  }, [connectedUser]);
 
   return (
     <div className="stories-container">
+      {error && <ShowInfoBanner msg={"⚠️ Something went wrong! Error details: " + error} />}
       {stories.length > 6 && (
         <button className="scroll-btn left" onClick={scrollLeft}>
           <FontAwesomeIcon icon={faChevronLeft} />
@@ -95,7 +105,9 @@ function Stories({ showAddStoryBox }) {
       )}
 
       <div className="stories" ref={storiesRef}>
-        <div className="user-story">
+        <div
+          className={`user-story ${connectedUserHasStory && "user-has-story"}`}
+        >
           <img
             src={connectedUser.profileUrl}
             alt={connectedUser.username + "profile"}

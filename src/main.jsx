@@ -17,6 +17,7 @@ import AddStory from "./components/story/AddStory.jsx";
 import Story from "./components/story/Story.jsx";
 import BirthDate from "./pages/register/BirthDate.jsx";
 import VerificationPage from "./pages/register/VerificationPage.jsx";
+import StoriesPage from "./components/stories/StoriesPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <Story />,
+        element: <StoriesPage />,
       },
     ],
   },

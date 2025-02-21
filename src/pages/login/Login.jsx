@@ -12,7 +12,7 @@ function Login() {
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState(false);
   const dispatch = useDispatch();
-  const { username, identifier } = useSelector((state) => state.authentication);
+  const identifier = useSelector((state) => state.authentication.identifier);
 
   const loginHandler = async (data) => {
     setError(false);
@@ -23,12 +23,15 @@ function Login() {
       setError(error);
       return;
     }
-    console.log(response)
+    console.log(response);
     dispatch(
       login({
-        username: username,
+        username: response.username,
         identifier: identifier,
-        authToken: response.authToken,
+        authToken: response.token,
+        profileUrl:
+          response.profileUrl ||
+          "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
         isAuthenticated: true,
       })
     );

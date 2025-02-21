@@ -13,8 +13,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faCircle as faCircleEmpty } from "@fortawesome/free-regular-svg-icons";
 import "./UploadPostDetails.scss";
+import useConnectedUser from "../../hooks/useConnectedUser";
+import { useForm } from "react-hook-form";
 
 function generateDots(length, idx) {
+  if (length === 1) return;
   return (
     <div className="post-state">
       {Array.from({ length }, (_, index) => (
@@ -31,14 +34,11 @@ function generateDots(length, idx) {
 }
 
 function UploadPostDetails({ files, handlePostUpload }) {
-  const connectedUser = {
-    username: "aniket205kadam",
-    profileUrl:
-      "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=600",
-  };
-  const captionCount = 20;
+  const connectedUser = useConnectedUser();
+  const [captionCount, setCaptionCount] = useState(0);
   const [mediaIdx, setMediaIdx] = useState(0);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+  const { register, handleSubmit, trigger } = useForm();
 
   return (
     <div className="post-container">
@@ -47,7 +47,13 @@ function UploadPostDetails({ files, handlePostUpload }) {
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <p>New reel</p>
-        <span onClick={handlePostUpload}>Share</span>
+        <span>
+          <button onClick={async () => {
+            const isValid = await trigger();
+            console.log("here")
+            if (isValid) handleSubmit(handlePostUpload)();
+          }}>Share</button>
+        </span>
       </div>
       <div className="body">
         <div
@@ -97,16 +103,30 @@ function UploadPostDetails({ files, handlePostUpload }) {
           </div>
           <form>
             <div className="caption">
-              <input type="text" name="caption" />
+              <input
+                type="text"
+                name="caption"
+                {...register("caption", { required: true })}
+                onChange={(event) => setCaptionCount(event.target.value.length)}
+              />
               <FontAwesomeIcon icon={faFaceSmile} />
               <span>{captionCount}/2,200</span>
             </div>
             <div className="location">
-              <input type="text" placeholder="Add location" name="location" />
+              <input
+                type="text"
+                placeholder="Add location"
+                name="location"
+                {...register("location", { required: true })}
+              />
               <FontAwesomeIcon icon={faEarthAsia} />
             </div>
             <div className="collaborators">
-              <input type="text" placeholder="Add collaborators" />
+              <input
+                type="text"
+                placeholder="Add collaborators"
+                {...register("collaborators", { required: false })}
+              />
               <FontAwesomeIcon icon={faUserPlus} />
             </div>
             {/* <div className="advanced-settings" onClick={() => setIsAdvancedSettingsOpen(prev => !prev)}>
@@ -165,7 +185,11 @@ function UploadPostDetails({ files, handlePostUpload }) {
                       Hide like and view counts on this post
                     </label>
                     <label class="switch">
-                      <input type="checkbox" id="like-view" />
+                      <input
+                        type="checkbox"
+                        id="like-view"
+                        {...register("isHideLike", { required: false })}
+                      />
                       <span class="slider"></span>
                     </label>
                     <p>
@@ -179,7 +203,11 @@ function UploadPostDetails({ files, handlePostUpload }) {
                   <div className="setting-item">
                     <label htmlFor="comment">Turn off commenting</label>
                     <label class="switch">
-                      <input type="checkbox" id="comment" />
+                      <input
+                        type="checkbox"
+                        id="comment"
+                        {...register("isHideComment", { required: false })}
+                      />
                       <span class="slider"></span>
                     </label>
                     <p>

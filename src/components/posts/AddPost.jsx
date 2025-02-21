@@ -3,36 +3,67 @@ import FileUpload from "../post/FileUpload";
 import UploadPostDetails from "../post/UploadPostDetails";
 import "./AddPost.scss";
 import Rocket from "../3D-componets/Rocket";
+import postService from "../../services/postService";
+import ShowInfoBanner from "../popups/ShowInfoBanner";
+import useAuthToken from "../../hooks/useAuthToken";
+import { useSelector } from "react-redux";
 
 function AddPost({ ref }) {
-  const [files, setFiles] = useState(null);
+  const [files, setFiles] = useState("");
+  const [currPostId, setCurrPostId] = useState("");
   const [uploadState, setUploadState] = useState({
     isUploadingContent: false,
     isUploadingDetails: false,
     isPostAdded: false,
     isCompleted: false,
   });
+  const [error, setError] = useState("");
+  const authToken = useAuthToken();
 
   const uploadContent = async (selectedFiles) => {
     setFiles(selectedFiles);
-    setUploadState({ ...uploadState, isUploadingContent: true });
-
-    // Simulate uploading delay
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log(
-      "Uploaded server data:",
-      selectedFiles.map((file) => file.name)
+    const { success, error, data } = await postService.uploadPostContent(
+      selectedFiles,
+      authToken,
+      20000
     );
+    if (!success) setError(error);
+    setCurrPostId(data);
+    setUploadState({ ...uploadState, isUploadingContent: true });
   };
 
-  const uploadPostDetails = async () => {
+  const uploadPostDetails = async (data) => {
     setUploadState({
       ...uploadState,
       isPostAdded: true,
       isUploadingDetails: true,
     });
 
-    console.log("Uploading data...");
+    const { success, error, response } = await postService.uploadPostMetaData(
+      {
+        id: currPostId,
+        caption: data.caption,
+        visibility: "PUBLIC",
+        isArchived: false,
+        location: data.location,
+        // collaborators: data.collaborators,
+        hideLikesAndViewCounts: data.isHideLike,
+        allowComments: data.isHideComment,
+      },
+      authToken,
+      20000
+    );
+
+    if (!success) {
+      setError(error);
+      return;
+    }
+
+    if (currPostId != response) {
+      setError(new Error("Hmm... That didn’t go as planned! 🤔"));
+      return;
+    }
+
     setTimeout(() => {
       setUploadState({
         isUploadingContent: false,
@@ -40,12 +71,32 @@ function AddPost({ ref }) {
         isPostAdded: true,
         isCompleted: true,
       });
+      setCurrPostId(response);
     }, 5000);
   };
 
   return (
     <div className="page-overlay">
-      <div className="upload-container"  ref={ref}>
+      {uploadState.isUploadingContent && (
+        <ShowInfoBanner
+          msg={
+            "🎉 Success! Your post content has been uploaded seamlessly! 🚀✨"
+          }
+          success
+        />
+      )}
+      {uploadState.isCompleted && (
+        <ShowInfoBanner
+          msg={
+            "🎉 Success! Your post has been uploaded seamlessly! 🚀✨\n" +
+            "POST ID: " +
+            currPostId
+          }
+          success
+        />
+      )}
+      {error && <ShowInfoBanner msg={"❌ ERROR: " + error} />}
+      <div className="upload-container" ref={ref}>
         {!uploadState.isUploadingContent && !uploadState.isCompleted && (
           <FileUpload contentHandler={uploadContent} />
         )}
