@@ -1,7 +1,8 @@
 import useAuthToken from "../hooks/useAuthToken";
 
 class postService {
-  baseUrl = "httP://localhost:8080/api/v1/posts";
+  baseUrl = "http://localhost:8080/api/v1/posts";
+  mediaUrl = "http://localhost:8080/api/v1/media";
 
   async uploadPostContent(contents, token, timeout = 10000) {
     if (contents === null)
@@ -189,10 +190,38 @@ class postService {
     }
   }
 
-  //   async deletePostById(postId, timeout = 10000) {
-  //     if (postId === null || postId === "")
-  //       throw new Error("Post Id is required for delete the post!");
-  //   }
+  async getPostMediaImagePreview(postId, token, timeout = 10000) {
+    if ((postId === null, postId === ""))
+      throw new Error("Post Id is required for get preview of post!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.mediaUrl}/post/preview/${postId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.blob(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
 }
 
 export default new postService();

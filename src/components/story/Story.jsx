@@ -14,7 +14,6 @@ import "./Story.scss";
 import { useConvertTime } from "../../hooks/useConvertTime";
 
 function Story({ userStories, isAudio, setIsAudio }) {
-  console.log("username: " + userStories[0].user.username);
   const [stories, setStories] = useState([]);
   const [storyIdx, setStoryIdx] = useState(0);
   const [isPause, setIsPause] = useState(false);
@@ -39,7 +38,9 @@ function Story({ userStories, isAudio, setIsAudio }) {
   };
 
   const scrollRight = () => {
-    setStoryIdx((prevStoryIdx) => Math.min(prevStoryIdx + 1, stories.length - 1));
+    setStoryIdx((prevStoryIdx) =>
+      Math.min(prevStoryIdx + 1, stories.length - 1)
+    );
   };
 
   useEffect(() => {
@@ -52,8 +53,8 @@ function Story({ userStories, isAudio, setIsAudio }) {
   useEffect(() => {
     setStoryIdx(0);
     setStories(userStories);
-    setLoading(false)
-  }, [userStories]);
+    setLoading(false);
+  }, [storyIdx, userStories]);
 
   if (loading) {
     return <div style={{ color: "white" }}>Loading...</div>;
@@ -113,7 +114,6 @@ function Story({ userStories, isAudio, setIsAudio }) {
               </div>
             )}
           </div>
-
           <div className="story-footer">
             <input
               type="text"

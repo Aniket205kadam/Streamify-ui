@@ -1,0 +1,320 @@
+.post-details-container {
+    display: flex;
+    width: 100%;
+    max-width: 935px; // Instagram's max width for posts
+    margin: 20px auto; // Add margin for better spacing
+    border: 1px solid #dbdbdb; // Instagram's border color
+    border-radius: 10px; // Rounded corners
+    background-color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; // Instagram's font
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+    overflow: hidden; // Ensure rounded corners are applied
+  
+    .left {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #000;
+  
+      .left-chevron,
+      .right-chevron {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #fff;
+        font-size: 20px; // Smaller chevron size
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 10px; // Slightly larger padding
+        border-radius: 50%;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+  
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.8);
+          transform: translateY(-50%) scale(1.1); // Slight scale effect on hover
+        }
+      }
+  
+      .left-chevron {
+        left: 10px; // Smaller spacing
+      }
+  
+      .right-chevron {
+        right: 10px; // Smaller spacing
+      }
+  
+      .content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+  
+        img,
+        video {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+          border-radius: 10px; // Rounded corners for media
+        }
+      }
+  
+      .image-position {
+        position: absolute;
+        bottom: 10px; // Smaller spacing
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 5px 10px;
+        border-radius: 20px;
+        color: #fff;
+        font-size: 12px;
+      }
+    }
+  
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px; // Slightly larger padding
+      background-color: #fff;
+  
+      .post-owner {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px; // Larger spacing
+  
+        .user-profile img {
+          width: 40px; // Slightly larger profile image
+          height: 40px;
+          border-radius: 50%;
+          margin-right: 12px; // Larger spacing
+          border: 2px solid #fff; // Add a border for better contrast
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Subtle shadow
+        }
+  
+        .user-name {
+          flex: 1;
+  
+          .name {
+            font-weight: 600; // Instagram uses semi-bold for usernames
+            font-size: 14px; // Smaller font size
+            color: #262626; // Darker text for better readability
+          }
+  
+          .location {
+            font-size: 12px;
+            color: #8e8e8e; // Instagram's secondary text color
+          }
+        }
+  
+        .more-options {
+          cursor: pointer;
+          font-size: 18px; // Slightly larger icon size
+          color: #262626; // Instagram's icon color
+          transition: color 0.3s ease;
+  
+          &:hover {
+            color: #0095f6; // Instagram's link color on hover
+          }
+        }
+      }
+  
+      hr {
+        border: 0;
+        height: 1px;
+        background-color: #dbdbdb; // Instagram's divider color
+        margin: 16px 0; // Larger spacing
+      }
+  
+      .post-info {
+        margin-bottom: 16px; // Larger spacing
+  
+        .caption {
+          font-size: 14px; // Smaller font size
+          margin-bottom: 8px; // Smaller spacing
+          color: #262626; // Darker text for better readability
+        }
+  
+        .time {
+          font-size: 10px; // Smaller font size
+          color: #8e8e8e; // Instagram's secondary text color
+        }
+      }
+  
+      .comment-section {
+        flex: 1;
+        overflow-y: auto; // Add scrollbar if content overflows
+        margin-bottom: 16px; // Larger spacing
+        max-height: 300px; // Limit height for scrollbar to appear
+        padding-right: 8px; // Add padding for scrollbar
+  
+        .comment {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px; // Larger spacing
+  
+          .user-profile img {
+            width: 32px; // Slightly larger profile image
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 12px; // Larger spacing
+            border: 2px solid #fff; // Add a border for better contrast
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Subtle shadow
+          }
+  
+          .content {
+            flex: 1;
+            font-size: 14px; // Smaller font size
+            color: #262626; // Darker text for better readability
+          }
+  
+          .time {
+            font-size: 10px; // Smaller font size
+            color: #8e8e8e; // Instagram's secondary text color
+          }
+  
+          .likes {
+            font-size: 10px; // Smaller font size
+            color: #8e8e8e;
+          }
+  
+          .like-button {
+            margin-left: 12px; // Larger spacing
+            cursor: pointer;
+            transition: color 0.3s ease;
+  
+            &:hover {
+              color: #ed4956; // Instagram's like color on hover
+            }
+          }
+        }
+      }
+  
+      .owner-option {
+        margin-bottom: 16px; // Larger spacing
+  
+        button {
+          background: none;
+          border: none;
+          color: #0095f6; // Instagram's link color
+          cursor: pointer;
+          font-weight: 600; // Semi-bold
+          font-size: 14px; // Smaller font size
+          transition: color 0.3s ease;
+  
+          &:hover {
+            color: #00376b; // Darker color on hover
+          }
+        }
+      }
+  
+      .actions {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px; // Larger spacing
+  
+        .icons {
+          margin-right: 16px; // Larger spacing
+          cursor: pointer;
+          font-size: 24px; // Smaller icon size
+          color: #262626; // Instagram's icon color
+          transition: color 0.3s ease;
+  
+          &:hover {
+            color: #0095f6; // Instagram's link color on hover
+          }
+        }
+  
+        .save {
+          margin-left: auto;
+          cursor: pointer;
+          font-size: 24px; // Smaller icon size
+          transition: color 0.3s ease;
+  
+          &:hover {
+            color: #0095f6; // Instagram's link color on hover
+          }
+        }
+      }
+  
+      .info {
+        margin-bottom: 12px; // Larger spacing
+  
+        .likes {
+          font-weight: 600; // Semi-bold
+          font-size: 14px; // Smaller font size
+          color: #262626; // Darker text for better readability
+        }
+  
+        .createAt {
+          font-size: 10px; // Smaller font size
+          color: #8e8e8e; // Instagram's secondary text color
+        }
+      }
+  
+      .enter-commment-section {
+        border-top: 1px solid #dbdbdb; // Add a top border
+        padding-top: 12px; // Add padding at the top
+  
+        .comment-opt {
+          margin-bottom: 12px; // Larger spacing
+  
+          span {
+            color: #8e8e8e; // Instagram's secondary text color
+            cursor: pointer;
+            font-size: 14px; // Smaller font size
+            transition: color 0.3s ease;
+  
+            &:hover {
+              color: #0095f6; // Instagram's link color on hover
+            }
+          }
+        }
+  
+        .add-comment {
+          display: flex;
+          align-items: center;
+  
+          input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px; // Larger padding
+            font-size: 14px; // Smaller font size
+            border-radius: 8px; // Rounded corners
+            background-color: #fafafa; // Light background for input
+            transition: background-color 0.3s ease;
+  
+            &:focus {
+              background-color: #fff; // Change background on focus
+              box-shadow: 0 0 0 2px #0095f6; // Highlight focus
+            }
+          }
+  
+          .comment-btn {
+            background: none;
+            border: none;
+            color: #0095f6; // Instagram's link color
+            cursor: pointer;
+            font-weight: 600; // Semi-bold
+            font-size: 14px; // Smaller font size
+            margin-left: 12px; // Larger spacing
+            transition: color 0.3s ease;
+  
+            &:disabled {
+              color: #ccc;
+              cursor: not-allowed;
+            }
+  
+            &:hover:not(:disabled) {
+              color: #00376b; // Darker color on hover
+            }
+          }
+        }
+      }
+    }
+  }

@@ -111,7 +111,7 @@ function Stories({ showAddStoryBox }) {
           <img
             src={connectedUser.profileUrl}
             alt={connectedUser.username + "profile"}
-            onClick={() => navigate(`/stories/${connectedUser.username}`)}
+            onClick={() => navigate(`/my-stories`)}
           />
           <span>{connectedUser.username}</span>
           <button className="add-story-btn" onClick={showAddStoryBox}>

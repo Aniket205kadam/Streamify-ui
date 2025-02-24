@@ -9,35 +9,36 @@ function ProtectedRoute({ children, authentication }) {
   );
   const [isUserAuthenticated, setIsUserAuthenticated] = useState(isAuthenticated);
 
-  console.log(isAuthenticated);
   useEffect(() => {
-    // (() => {
-    //   try {
-    //     const decodedToken = jwtDecode(authToken);
-    //     const currTime = Date.now() / 1000;
-    //     console.log(decodedToken.exp + " : " + currTime)
-    //     if (decodedToken.exp < currTime) {
-    //       setIsUserAuthenticated(false);
-    //       return;
-    //     }
-    //     setIsUserAuthenticated(true);
-    //   } catch (error) {
-    //     setIsUserAuthenticated(false);
-    //   }
-    // })();
+    if (!authToken) {
+      setIsUserAuthenticated(false);
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(authToken);
+      const currTime = Date.now() / 1000;
+
+      if (decodedToken.exp < currTime) {
+        setIsUserAuthenticated(false);
+      } else {
+        setIsUserAuthenticated(true);
+      }
+    } catch (error) {
+      setIsUserAuthenticated(false);
+    }
   }, [authToken, isAuthenticated]);
 
-  console.log(isAuthenticated);
-
-  // if user not login then show the other pages
+  // Redirect to login if authentication is required but user is not authenticated
   if (authentication && !isUserAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  // if user login then not show the login and register page
+  // Redirect to home if user is authenticated but tries to access login/register pages
   if (!authentication && isUserAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
+
   return children;
 }
 

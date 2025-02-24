@@ -1,0 +1,122 @@
+.own-stories-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    gap: 20px;
+
+  
+    .left {
+      flex: 1;
+    }
+  
+    .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .close-page {
+        
+        button {
+          color: #333;
+          background-color: inherit;
+          border: none;
+          font-size: 30px;
+          padding-left: 95%;
+        }
+      }
+
+    .story-interactions {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 16px;
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      
+        .interaction-section {
+          padding: 12px;
+          border-radius: 8px;
+          background-color: #fff;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+      
+          .show-more-btn {
+            border: none;
+            padding: 3px;
+            display: flex;
+            background-color: #fff;
+            
+            &:hover {
+              color: rgb(50, 50, 250);
+            }
+        }
+      
+          h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+          }
+      
+          .interaction-count {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+          }
+      
+          .users-list, .replies-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+      
+          .user-item, .reply-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #fafafa;
+      
+            .user-avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              object-fit: cover;
+            }
+      
+            .user-details {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+      
+              .username {
+                font-size: 14px;
+                font-weight: 500;
+                color: #333;
+              }
+      
+              .time {
+                font-size: 12px;
+                color: #888;
+              }
+            }
+      
+            .reply-content {
+              margin: 0;
+              font-size: 14px;
+              color: #333;
+            }
+      
+            .reply-time {
+              font-size: 12px;
+              color: #888;
+              margin-left: auto;
+            }
+          }
+        }
+      }
+    }
+  }

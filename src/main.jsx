@@ -13,11 +13,10 @@ import { Provider } from "react-redux";
 import Reels from "./components/reels/Reels.jsx";
 import Explore from "./pages/explore/Explore.jsx";
 import Search from "./pages/search/Search.jsx";
-import AddStory from "./components/story/AddStory.jsx";
-import Story from "./components/story/Story.jsx";
 import BirthDate from "./pages/register/BirthDate.jsx";
 import VerificationPage from "./pages/register/VerificationPage.jsx";
-import StoriesPage from "./components/stories/StoriesPage.jsx";
+import OwnStories from "./components/stories/OwnStories.jsx";
+import PostDetails from "./components/post/PostDetails.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +32,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/:username",
+        path: "/profile/:username",
         element: <Profile />,
       },
       {
@@ -48,10 +47,10 @@ const router = createBrowserRouter([
         path: "/search",
         element: <Search />,
       },
-      {
-        path: "/test",
-        element: <StoriesPage />,
-      },
+      // {
+      //   path: "/test",
+      //   element: <OwnStories />,
+      // },
     ],
   },
   {
@@ -85,6 +84,18 @@ const router = createBrowserRouter([
         <VerificationPage />
       </ProtectedRoute>
     )
+  },
+  {
+    path: "/my-stories",
+    element: (
+      <ProtectedRoute authentication={true}>
+        <OwnStories />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: "/test",
+    element: <PostDetails />
   }
 ]);
 

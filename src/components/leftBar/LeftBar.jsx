@@ -21,6 +21,7 @@ import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { dark, light } from "../../store/themeSlice";
 import { useNavigate, useLocation } from "react-router-dom";
+import useConnectedUser from "../../hooks/useConnectedUser";
 
 function LeftBar({
   searchHandler,
@@ -29,12 +30,7 @@ function LeftBar({
   createPostHandler,
   isOpenCreatePostBox,
 }) {
-  const profileUrl =
-    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
-  const currentUser = {
-    username: "aniket205kadam",
-    email: "aniketrkadam205@gmail.com",
-  };
+  const connectedUser = useConnectedUser();
   // const theme = useSelector((state) => state.theme.theme);
   // const [showPopup, setShowPopup] = useState(false);
   const popup = useRef();
@@ -166,15 +162,15 @@ function LeftBar({
             )}
           </div>
 
-          <div className="user">
-            {currentLocation.pathname === "/:username" && !isOpenSearchBox ? (
+          <div className="user" onClick={() => navigate(`/profile/${connectedUser.username}`)}>
+            {currentLocation.pathname === "" && !isOpenSearchBox ? (
               <>
-                <img src={profileUrl} alt="Profile" />
+                <img src={connectedUser.profileUrl} alt={connectedUser.username + " profile"} />
                 <span style={{ fontWeight: "bold" }}>Profile</span>
               </>
             ) : (
               <>
-                <img src={profileUrl} alt="Profile" />
+                <img src={connectedUser.profileUrl} alt={connectedUser.username + " profile"} />
                 <span>Profile</span>
               </>
             )}
