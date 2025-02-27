@@ -190,7 +190,7 @@ class postService {
     }
   }
 
-  async getPostMediaImagePreview(postId, token, timeout = 10000) {
+  async getPostMediaImagePreview(postId, token, timeout = 40000) {
     if ((postId === null, postId === ""))
       throw new Error("Post Id is required for get preview of post!");
     const controller = new AbortController();

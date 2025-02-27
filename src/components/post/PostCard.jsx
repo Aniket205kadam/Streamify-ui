@@ -10,39 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import postService from "../../services/postService";
 import useAuthToken from "../../hooks/useAuthToken";
-
-// {
-//   id: "104",
-//   caption:
-//     "Late-night coding session fueled by coffee and determination! ☕️💻",
-//   user: {
-//     id: "",
-//     username: "code_master",
-//     profileUrl:
-//       "https://images.pexels.com/photos/3748221/pexels-photo-3748221.jpeg?auto=compress&cs=tinysrgb&w=600",
-//   },
-//   liked: true,
-//   likesCount: 89,
-//   commentsCount: 30,
-//   createdAt: "2025-02-09T23:45:00Z",
-//   location: "San Francisco, CA",
-//   collaborators: [],
-//   hideLikesAndViewCounts: false,
-//   allowComments: true,
-//   postMedia: [
-//     {
-//       id: "205",
-//       postId: "104",
-//       mediaUrl:
-//         "https://videos.pexels.com/video-files/30627970/13111089_1440_2560_25fps.mp4",
-//       thumbnailUrl:
-//         "https://images.pexels.com/photos/30594080/pexels-photo-30594080/free-photo-of-playful-cat-relaxing-on-sunlit-rocks-outdoors.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
-//       type: "video",
-//       altText:
-//         "A laptop screen displaying lines of code with a cup of coffee nearby",
-//     },
-//   ],
-// }
+import ShowInfoBanner from "../popups/ShowInfoBanner";
 
 function PostCard({ post }) {
   const authToken = useAuthToken();
@@ -60,8 +28,10 @@ function PostCard({ post }) {
     })()
   }, []);
 
+
   return (
     <div className="post-card" key={post.id}>
+      {error && <ShowInfoBanner msg={`🪲 ${error}`} />}
       {post.postMedia[0].type.startsWith("image/") ? (
         <img
           src={firstPostImage}

@@ -67,7 +67,7 @@ function App() {
         {showRightBar && <RightBar isBlur={showSearchBox} />}
       </div>
 
-      {showSearchBox && <Search ref={searchRef} />}
+      {showSearchBox && <Search ref={searchRef} setShowSearchBox={setShowSearchBox} />}
       {showMoreOptions && (
         <MoreOptions
           ref={moreOptionsRef}

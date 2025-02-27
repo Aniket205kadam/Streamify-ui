@@ -48,7 +48,7 @@ function AddPost({ ref }) {
         location: data.location,
         // collaborators: data.collaborators,
         hideLikesAndViewCounts: data.isHideLike,
-        allowComments: data.isHideComment,
+        allowComments: !data.isHideComment, //TODO: make changes here
       },
       authToken,
       20000

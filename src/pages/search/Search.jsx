@@ -5,98 +5,73 @@ import { useState } from "react";
 import { useRef } from "react";
 import "./Search.scss";
 import SearchLoader from "./SearchLoader";
+import userService from "../../services/userService";
+import useAuthToken from "../../hooks/useAuthToken";
+import ShowInfoBanner from "../../components/popups/ShowInfoBanner";
+import { useNavigate } from "react-router-dom";
 
-function Search({ ref }) {
+function Search({ ref, setShowSearchBox }) {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const recentSearchsFeak = [
-    {
-      id: "1234",
-      profileUrl:
-        "https://images.pexels.com/photos/1194806/pexels-photo-1194806.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      username: "rohini",
-      fullName: "rohini sharma",
-      isFollowing: false,
-      followersCount: 10,
-    },
-    {
-      id: "1234",
-      profileUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSC0FDNB1TTDRbwvNWLH-QNBSpSsFtKpYd0wQ&s",
-      username: "rohitsharma45",
-      fullName: "Rohit Sharma",
-      isFollowing: true,
-      followersCount: 1000,
-    },
-  ];
-  const result = [
-    {
-      id: "5678",
-      profileUrl:
-        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600",
-      username: "aisha_k",
-      fullName: "Aisha Khan",
-      isFollowing: true,
-      followersCount: 500,
-    },
-    {
-      id: "9101",
-      profileUrl:
-        "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600",
-      username: "john_doe",
-      fullName: "John Doe",
-      isFollowing: false,
-      followersCount: 150,
-    },
-    {
-      id: "1121",
-      profileUrl:
-        "https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=600",
-      username: "samantha_smith",
-      fullName: "Samantha Smith",
-      isFollowing: true,
-      followersCount: 1200,
-    },
-    {
-      id: "3141",
-      profileUrl:
-        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600",
-      username: "max_well",
-      fullName: "Maxwell Johnson",
-      isFollowing: false,
-      followersCount: 300,
-    },
-  ];
 
-  const [query, setQuery] = useState(null);
+  const [query, setQuery] = useState("");
   const [startSearching, setStartSearching] = useState(false);
-  const [recentSearchs, setRecentSearchs] = useState(recentSearchsFeak);
-  const [similerUsers, setSimilerUsers] = useState(null);
+  const [recentSearch, setRecentSearch] = useState([]);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [similerUsers, setSimilerUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [page, setPage] = useState(0);
   const recentRef = useRef(null);
 
+  const authToken = useAuthToken();
+
   const handleQuery = (event) => {
-    setQuery(event.target.value);
+    setQuery(event.target.value || "");
   };
 
   useEffect(() => {
-    async function getData() {
-      if (!(query === null || query?.length === 0)) {
+    (async () => {
+      setError(false);
+      if (query !== null && query !== "") {
         setStartSearching(true);
         setLoading(true);
-        console.log("api call");
         await delay(2000);
         setLoading(false);
-        setSimilerUsers(result);
+        const response = await userService.searchUsers(
+          query,
+          page,
+          5,
+          authToken
+        );
+        if (!response.success) {
+          setError(response.error);
+          return;
+        }
+        setSimilerUsers(response.data.content);
       }
-      if (query === null || query?.length === 0) {
+      if (query === null || query === "") {
         setStartSearching(false);
       }
-    }
-    getData();
+    })();
   }, [query]);
+
+  useEffect(() => {
+    (async () => {
+      setError(false);
+      setRecentLoading(true);
+      const response = await userService.getRecentSearch(authToken);
+      if (!response.success) {
+        setError(response.error);
+        return;
+      }
+      setRecentSearch(response.data);
+      setRecentLoading(false);
+    })();
+  }, [authToken]);
 
   return (
     <div className="search-page" ref={ref}>
+      {error && <ShowInfoBanner msg={"🐞ERROR: " + error} />}
       <div className="search">
         <h1>Search</h1>
         <div className="search-bar">
@@ -106,14 +81,9 @@ function Search({ ref }) {
             value={query}
             onChange={handleQuery}
           />
-          {query != null && query != "" && (
+          {query !== null && query !== "" && (
             <button>
-              <FontAwesomeIcon
-                icon={faXmark}
-                onClick={() => {
-                  setQuery("");
-                }}
-              />
+              <FontAwesomeIcon icon={faXmark} onClick={() => setQuery("")} />
             </button>
           )}
         </div>
@@ -121,61 +91,86 @@ function Search({ ref }) {
           <div className="recent" ref={recentRef}>
             <hr />
             <h2>Recent</h2>
-            {recentSearchs?.length === 0 && <span className="msg">No recent searches.</span>}
-            {recentSearchs?.map((recent) => (
-              <div className="user-info" key={recent.username}>
-                <div className="user-profile">
-                  <img
-                    src={recent.profileUrl}
-                    alt={recent.username + " profile"}
-                  />
-                </div>
-                <div className="details">
-                  <div className="username">{recent.username}</div>
-                  <div className="info">
-                    <span>{recent.fullName}</span>{" "}
-                    {recent.isFollowing ? (
-                      <span>• Following</span>
-                    ) : (
-                      <span>• {recent.followersCount} Followers</span>
-                    )}
-                  </div>
-                </div>
-                <div className="recent-delete">
-                  <button
-                    onClick={() =>
-                      console.log("delete from the recent: " + recent.username)
-                    }
-                  >
-                    <FontAwesomeIcon icon={faXmark} />
-                  </button>
-                </div>
+            {/* TODO: fix it later */}
+            {/* {recentLoading ? (
+              <span>Loading...</span>
+            ) : (
+              <div className="recent-section">
+                {recentSearch.length === 0 && (
+                  <span className="msg">No recent searches.</span>
+                )}
+                {recentSearch.map((recent) => (
+                  <UserCard key={recent.id} user={recent} setError={setError} />
+                ))}
               </div>
-            ))}
+            )} */}
           </div>
         ) : (
           <div className="searched-users">
             {loading && <SearchLoader count={10} />}
-            {similerUsers?.map((user) => (
-              <div className="user-info" key={user.username}>
-                <div className="user-profile">
-                  <img src={user.profileUrl} alt={user.username + " profile"} />
-                </div>
-                <div className="details">
-                  <div className="username">{user.username}</div>
-                  <div className="info">
-                    <span>{user.fullName}</span>{" "}
-                    {user.isFollowing ? (
-                      <span>• Following</span>
-                    ) : (
-                      <span>• {user.followersCount}</span>
-                    )}
-                  </div>
-                </div>
+            {similerUsers.length === 0 && (
+              <div className="msg">
+                <p>There is no user found.</p>
               </div>
-            ))}
+            )}
+            {similerUsers.length > 0 &&
+              similerUsers.map((user) => (
+                <UserCard key={user.id} user={user} setError={setError} setShowSearchBox={setShowSearchBox} />
+              ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function UserCard({ user, setError, setShowSearchBox }) {
+  const [userProfile, setUserProfile] = useState();
+  const authToken = useAuthToken();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const response = await userService.getUserProfileByUsername(
+        user.username,
+        authToken
+      );
+      if (!response.success) {
+        setError(response.error);
+        return;
+      }
+      setUserProfile(URL.createObjectURL(response.data));
+    })();
+  }, []);
+
+  const handleClickOnUser = async () => {
+    const response = await userService.addRecentSearchedUsers(
+      user.username,
+      authToken
+    );
+    navigate(`/profile/${user.username}`)
+    setShowSearchBox(false);
+    if (!response.success) {
+      setError(response.error);
+      return;
+    }
+  };
+
+  return (
+    <div className="user-info" key={user.id} onClick={handleClickOnUser}>
+      <div className="user-profile">
+        <img src={userProfile} alt={user.username + " profile"} />
+      </div>
+      <div className="details">
+        <div className="username">{user.username}</div>
+        <div className="info">
+          <span>{user.fullName}</span>{" "}
+          {user.isFollowedByCurrentUser ? (
+            <span>• Following</span>
+          ) : (
+            <span>• {user.followerCount}</span>
+          )}
+        </div>
       </div>
     </div>
   );

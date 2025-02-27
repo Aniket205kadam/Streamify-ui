@@ -11,6 +11,7 @@ import {
   faChevronRight,
   faGear,
   faCamera,
+  faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import VerifiedBadge from "../../components/icons/VerifiedBadge";
 import ReelIcon from "../../components/icons/ReelIcon";
@@ -21,6 +22,7 @@ import userService from "../../services/userService";
 import useAuthToken from "../../hooks/useAuthToken";
 import useConnectedUser from "../../hooks/useConnectedUser";
 import storyService from "../../services/storyService";
+import ShowInfoBanner from "../../components/popups/ShowInfoBanner";
 
 function Profile() {
   const { username } = useParams();
@@ -52,7 +54,14 @@ function Profile() {
   useClickOutside(followingBoxRef, () => setShowFollowing(false));
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    setUser(null);
+    setPosts([]);
+    setReels([]);
+    setLoading(true);
+    setPostLoading(true);
+    setError(null);
+
+    (async () => {
       try {
         const [userData, profileData, storyData] = await Promise.all([
           userService.getUserByUsername(username, authToken),
@@ -72,10 +81,12 @@ function Profile() {
         });
 
         if (isOwnProfile) {
-          console.log("here")
-          const postsResponse = await userService.getMyPosts(authToken, postPage, 10);
+          const postsResponse = await userService.getMyPosts(
+            authToken,
+            postPage,
+            10
+          );
           if (postsResponse.success) {
-            console.log(postsResponse.data.content)
             setPosts(postsResponse.data.content);
           } else {
             setError("Failed to fetch posts");
@@ -88,10 +99,8 @@ function Profile() {
         setError("An error occurred while fetching data");
         setLoading(false);
       }
-    };
-
-    fetchUserData();
-  }, [username, authToken, isOwnProfile]);
+    })();
+  }, [username, authToken, isOwnProfile, postPage]);
 
   const handleSuggestedUser = () => {
     setShowSuggestedUser((prev) => !prev);
@@ -99,9 +108,13 @@ function Profile() {
 
   const handleReels = async () => {
     try {
-      const reelsResponse = await userService.getUserReels(username, authToken);
+      const reelsResponse = await userService.getMyReels(
+        authToken,
+        reelPage,
+        10
+      );
       if (reelsResponse.success) {
-        setReels(reelsResponse.data);
+        setReels(reelsResponse.data.content);
         setShowReels(true);
         setShowPosts(false);
       } else {
@@ -216,9 +229,51 @@ const Loading = () => {
   );
 };
 
-function ProfileHeader({ user, isOwnProfile, onShowFollowers, onShowFollowing, onSuggestedUser }) {
+function ProfileHeader({
+  user,
+  isOwnProfile,
+  onShowFollowers,
+  onShowFollowing,
+  onSuggestedUser,
+}) {
+  const authToken = useAuthToken();
+  const [followStatus, setFollowStatus] = useState({
+    clickFollowBtn: false,
+    status: null,
+  });
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const response = await userService.isFollowingUser(user.id, authToken);
+      if (response.success)
+        setIsFollowing(response.data === "true" ? true : false);
+    })();
+  }, [user, isOwnProfile]);
+
+  const followHandler = async () => {
+    const resposne = await userService.followUser(user.id, authToken);
+    if (resposne.success)
+      setFollowStatus({ clickFollowBtn: true, status: true });
+    else setFollowStatus({ clickFollowBtn: true, status: false });
+  };
+
   return (
     <div className="profile-header">
+      {followStatus.clickFollowBtn ? (
+        <div>
+          {followStatus.status ? (
+            <ShowInfoBanner
+              msg={`You're now following ${user.username}! 🎉`}
+              success
+            />
+          ) : (
+            <ShowInfoBanner
+              msg={`Oops! ❌ Failed to follow ${user.username}. Please try again!`}
+            />
+          )}
+        </div>
+      ) : null}
       <div className="profile-picture">
         <div className="edit-profile-option">
           <FontAwesomeIcon icon={faCamera} />
@@ -237,7 +292,16 @@ function ProfileHeader({ user, isOwnProfile, onShowFollowers, onShowFollowing, o
               </>
             ) : (
               <>
-                <button className="btn follow-btn">Follow</button>
+                {isFollowing ? (
+                  <button className="btn message-btn">
+                    Following
+                    <FontAwesomeIcon icon={faChevronDown} />
+                  </button>
+                ) : (
+                  <button className="btn follow-btn" onClick={followHandler}>
+                    Follow
+                  </button>
+                )}
                 <button className="btn message-btn">Message</button>
               </>
             )}
@@ -265,11 +329,19 @@ function ProfileHeader({ user, isOwnProfile, onShowFollowers, onShowFollowing, o
             <span className="count">{user.postsCount}</span>
             <span>Posts</span>
           </div>
-          <div className="stat" style={{ cursor: "pointer" }} onClick={onShowFollowers}>
+          <div
+            className="stat"
+            style={{ cursor: "pointer" }}
+            onClick={onShowFollowers}
+          >
             <span className="count">{user.followerCount}</span>
             <span>Followers</span>
           </div>
-          <div className="stat" style={{ cursor: "pointer" }} onClick={onShowFollowing}>
+          <div
+            className="stat"
+            style={{ cursor: "pointer" }}
+            onClick={onShowFollowing}
+          >
             <span className="count">{user.followingCount}</span>
             <span>Following</span>
           </div>
