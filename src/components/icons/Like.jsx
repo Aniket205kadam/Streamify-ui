@@ -1,10 +1,16 @@
 import React from "react";
 import "./Like.scss";
 
-function Like() {
+function Like({ isLiked, onClick }) {
   return (
     <div class="heart-container" title="Like">
-      <input type="checkbox" className="checkbox" id="Give-It-An-Id" />
+      <input
+        type="checkbox"
+        className="checkbox"
+        id="Give-It-An-Id"
+        checked={isLiked}
+        onChange={onClick}
+      />
       <div className="svg-container">
         <svg
           viewBox="0 0 24 24"

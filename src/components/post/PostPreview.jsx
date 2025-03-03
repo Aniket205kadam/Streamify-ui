@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./PostPreview.scss";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,12 +10,31 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import ReadMoreCaption from "./ReadMoreCaption";
+import userService from "../../services/userService";
+import Like from "../icons/Like";
+import useAuthToken from "../../hooks/useAuthToken";
+import { useConvertTime } from "../../hooks/useConvertTime";
+import useIsFollowing from "../../hooks/useIsFollowing";
+import PostInfo from "../popups/PostInfo";
+import postService from "../../services/postService";
+import Hls from "hls.js";
+import HlsVideoPlayer from "./HlsVideoPlayer";
+import ShowInfoBanner from "../popups/ShowInfoBanner";
 
 function PostPreview({ post }) {
   const isFromFollowedUser = false;
-  const [commentMsg, setCommentMsg] = useState(null);
+  const [commentMsg, setCommentMsg] = useState("");
   const mediaRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [error, setError] = useState(false);
+  const [userProfile, setUserProfile] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
+  const [isFollowingUserPost, setIsFollowingUserPost] = useState(false);
+  const [showMoreActions, setShowMoreActions] = useState(false);
+  const [postsMedia, setpostsMedia] = useState([]);
+  const [isLikedPost, setIsLikedPost] = useState(false);
+  const [toggleLikeBtn, setToggleLikeBtn] = useState(0);
+  const authToken = useAuthToken();
 
   const scrollLeft = () => {
     mediaRef.current.scrollBy({
@@ -35,26 +54,90 @@ function PostPreview({ post }) {
     console.log("Post: " + commentMsg);
   };
 
+  const likeBtnHandler = async () => {
+    const response = await postService.likePost(post.id, authToken);
+    if (!response.success) {
+      setError(response.error);
+      return;
+    }
+    setToggleLikeBtn((prev) => prev + 1);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const response = await userService.getUserProfileByUsername(
+        post.user.username,
+        authToken
+      );
+      if (!response.success) {
+        setError(response.error);
+        return;
+      }
+      setUserProfile(URL.createObjectURL(response.data));
+      setCreatedAt(useConvertTime(post.createdAt));
+
+      // check the give post is following user post
+      const status = await useIsFollowing(post.user.id, authToken);
+      setIsFollowingUserPost(status.data === "true" ? true : false);
+
+      // load the post images or videos
+      post.postMedia.forEach(async (postMedia) => {
+        const response = await postService.getPostMedia(
+          postMedia.id,
+          authToken
+        );
+        if (!response.success) {
+          setError(response.error);
+          return;
+        }
+        setpostsMedia((prevMedia) => {
+          if (prevMedia)
+            setpostsMedia([
+              ...prevMedia,
+              { id: postMedia.id, url: URL.createObjectURL(response.data) },
+            ]);
+          else
+            setpostsMedia([
+              { id: postMedia.id, url: URL.createObjectURL(response.data) },
+            ]);
+        });
+      });
+    })();
+  }, [post.user.username, authToken]);
+
+  useEffect(() => {
+    (async () => {
+      // check the current user like this post or not
+      const likeResponse = await postService.isLikedPost(post.id, authToken);
+      setIsLikedPost(likeResponse.data);
+    })();
+  }, [toggleLikeBtn]);
+
   return (
-    <div className="post">
+    <div className="post" key={post.id}>
+      {error && <ShowInfoBanner msg={error} />}
+      {toggleLikeBtn != 0 && isLikedPost && (
+        <ShowInfoBanner
+          msg={"You have successfully liked this post."}
+          success
+        />
+      )}
+      {showMoreActions && (
+        <PostInfo
+          isFavorites={false}
+          isFollowingPost={isFollowingUserPost}
+          closeOptions={setShowMoreActions}
+        />
+      )}
       <div className="container">
         <div className="user">
           <div className="userInfo">
             <div className="profile-image">
               <img
                 className="avatar user-avatar"
-                src={post.user.profileUrl}
-                alt={post.user.username + "profile"}
+                src={userProfile}
+                alt={post.user.username + " profile"}
               />
-              {post.collaborators.length > 0 && (
-                <img
-                  className="avatar collab-avatar"
-                  src={
-                    "https://images.pexels.com/photos/3779760/pexels-photo-3779760.jpeg?auto=compress&cs=tinysrgb&w=600"
-                  }
-                  alt={post.collaborators.username}
-                />
-              )}
             </div>
             <div className="details">
               <div className="username">
@@ -64,75 +147,107 @@ function PostPreview({ post }) {
                 >
                   <span className="name">{post.user.username}</span>
                 </Link>
-                {post.collaborators.length > 0 && (
+                {(post.collaborators || []).length > 0 && (
                   <div>
                     <span>and</span>
                     <span className="name">
                       {" "}
-                      {post.collaborators.length == 1
+                      {post.collaborators.length === 1
                         ? post.collaborators[0]
-                        : post.collaborators.length + " " + " others" }{" "}
+                        : post.collaborators.length + " others"}{" "}
                     </span>
                   </div>
                 )}
               </div>
-              <span className="date">{post.createdAt}</span>
+              <span className="date">{createdAt}</span>
             </div>
             {!isFromFollowedUser && (
               <button
                 className="follow-btn"
+                style={
+                  isFollowingUserPost
+                    ? {
+                        backgroundColor: "inherit",
+                        color: "#0a87f5",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                      }
+                    : undefined
+                }
                 onClick={() => {
-                  console.log(post.user.username + " follow");
+                  if (isFollowingUserPost) {
+                    console.log(post.user.username + " unFollow");
+                  } else {
+                    console.log(post.user.username + " follow");
+                  }
                 }}
               >
-                Follow
+                {isFollowingUserPost ? (
+                  <span>Following</span>
+                ) : (
+                  <span>Follow</span>
+                )}
               </button>
             )}
           </div>
-          <FontAwesomeIcon icon={faEllipsis} />
+          <FontAwesomeIcon
+            icon={faEllipsis}
+            onClick={() => setShowMoreActions(true)}
+          />
         </div>
         <div className="content">
-          {post.postMedia.length > 1 && (
+          {(post.postMedia || []).length > 1 && (
             <button className="scroll-btn left" onClick={scrollLeft}>
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
           )}
 
           <div className="media-container" ref={mediaRef}>
-            {post.postMedia.map((postMedia) =>
+            {(post.postMedia || []).map((postMedia) =>
               postMedia.type.startsWith("image") ? (
                 <img
-                  src={postMedia.mediaUrl}
-                  alt={postMedia.altText}
-                  key={postMedia.id}
+                  src={
+                    (postsMedia || []).find(
+                      (media) => media.id === postMedia.id
+                    )?.url
+                  }
                 />
               ) : postMedia.type.startsWith("video") ? (
-                  <video
-                    key={postMedia.id}
-                    muted={true}
-                    onDoubleClick={(event) => {
-                      if (isMuted) {
-                        event.target.muted = false;
-                      } else {
-                        event.target.muted = true;
-                      }
-                      setIsMuted(muted => !muted);
-                    }}
-                    onClick={(event) => {
-                      if (event.target.paused) {
-                        event.target.play();
-                      } else {
-                        event.target.pause();
-                      }
-                    }}
-                  >
-                    <source src={postMedia.mediaUrl} type="video/mp4" />
-                  </video>
+                // <video
+                //   key={postMedia.id}
+                //   muted={true}
+                //   onDoubleClick={(event) => {
+                //     if (isMuted) {
+                //       event.target.muted = false;
+                //     } else {
+                //       event.target.muted = true;
+                //     }
+                //     setIsMuted((muted) => !muted);
+                //   }}
+                //   onClick={(event) => {
+                //     if (event.target.paused) {
+                //       event.target.play();
+                //     } else {
+                //       event.target.pause();
+                //     }
+                //   }}
+                // >
+                //   <source src={postMedia.mediaUrl} type="video/mp4" />
+                // </video>
+                <HlsVideoPlayer
+                  isMuted={isMuted}
+                  setIsMuted={setIsMuted}
+                  videoUrl={
+                    (postsMedia || []).find(
+                      (media) => media.id === postMedia.id
+                    )?.url
+                  }
+                />
               ) : null
             )}
           </div>
 
-          {post.postMedia.length > 1 && (
+          {(post.postMedia || []).length > 1 && (
             <button className="scroll-btn right" onClick={scrollRight}>
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -140,37 +255,11 @@ function PostPreview({ post }) {
         </div>
         <div className="info">
           <div className="item">
-            <div class="heart-container" title="Like">
-              <input type="checkbox" class="checkbox" id="Give-It-An-Id" />
-              <div class="svg-container">
-                <svg
-                  viewBox="0 0 24 24"
-                  class="svg-outline"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
-                </svg>
-                <svg
-                  viewBox="0 0 24 24"
-                  class="svg-filled"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
-                </svg>
-                <svg
-                  class="svg-celebrate"
-                  width="100"
-                  height="100"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <polygon points="10,10 20,20"></polygon>
-                  <polygon points="10,50 20,50"></polygon>
-                  <polygon points="20,80 30,70"></polygon>
-                  <polygon points="90,10 80,20"></polygon>
-                  <polygon points="90,50 80,50"></polygon>
-                  <polygon points="80,80 70,70"></polygon>
-                </svg>
-              </div>
+            <div
+              className="like"
+              onClick={() => console.log("Like btn is clicked!")}
+            >
+              <Like isLiked={isLikedPost} onClick={likeBtnHandler} />
             </div>
           </div>
           <div className="item">
@@ -180,9 +269,9 @@ function PostPreview({ post }) {
             <FontAwesomeIcon icon={faPaperPlane} className="icon" />
           </div>
           <div className="save">
-            <label class="ui-bookmark">
+            <label className="ui-bookmark">
               <input type="checkbox" />
-              <div class="bookmark">
+              <div className="bookmark">
                 <svg viewBox="0 0 32 32">
                   <g>
                     <path d="M27 4v27a1 1 0 0 1-1.625.781L16 24.281l-9.375 7.5A1 1 0 0 1 5 31V4a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4z"></path>
@@ -193,11 +282,10 @@ function PostPreview({ post }) {
           </div>
         </div>
         <div className="likes">
-          <span>{post.likes} likes</span>
+          <span>{post.likeCount} likes</span>
         </div>
         <div className="caption">
-          {/* <strong>{post.user.username}</strong>{" "} */}
-          <ReadMoreCaption paragraph={post.caption} />
+          <ReadMoreCaption paragraph={post.caption || ""} />
         </div>
         <div className="comment-opt">
           <Link to={``} style={{ textDecoration: "none", color: "inherit" }}>

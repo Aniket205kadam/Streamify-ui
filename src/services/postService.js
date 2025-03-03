@@ -200,7 +200,7 @@ class postService {
       const response = await fetch(`${this.mediaUrl}/post/preview/${postId}`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         signal: controller.signal,
       });
@@ -220,6 +220,151 @@ class postService {
         error:
           error.name === "AbortError" ? "Request timed out" : error.message,
       };
+    }
+  }
+
+  async getFollowingsPosts(page, size, token, timeout = 10000) {
+    if (token === "" || token === null)
+      throw new Error("Auth token is required to get the posts!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/followings-posts?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getPostMedia(postMediaId, token, timeout = 10000) {
+    if (postMediaId === "" || postMediaId === null)
+      throw new Error("PostMediaId is required for get the post content!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.mediaUrl}/post/${postMediaId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.blob(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async isLikedPost(postId, token, timeout = 20000) {
+    if (postId === "" || postId === null)
+      throw new Error("PostId is required for get the post likes info!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/${postId}/isLiked`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const responseText = await response.text();
+      const isLiked = responseText === "true";
+      return {
+        success: true,
+        status: response.status,
+        data: isLiked,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  async likePost(postId, token, timeout = 20000) {
+    if (postId === "" || postId === null)
+      throw new Error("PostId is required if you can to like this post!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/${postId}/like`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.text(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 }

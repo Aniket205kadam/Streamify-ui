@@ -91,6 +91,11 @@ function Profile() {
           } else {
             setError("Failed to fetch posts");
           }
+        } else {
+          const postsResponse = await userService.getPostByUser(user.id, postPage, 10, authToken);
+          if (postsResponse.success)
+            setPosts(postsResponse.data.content);
+          else setError("Failed to fetch posts")
         }
 
         setLoading(false);
@@ -108,17 +113,29 @@ function Profile() {
 
   const handleReels = async () => {
     try {
-      const reelsResponse = await userService.getMyReels(
-        authToken,
-        reelPage,
-        10
-      );
-      if (reelsResponse.success) {
-        setReels(reelsResponse.data.content);
-        setShowReels(true);
-        setShowPosts(false);
+      if (isOwnProfile) {
+        const reelsResponse = await userService.getMyReels(
+          authToken,
+          reelPage,
+          10
+        );
+        if (reelsResponse.success) {
+          setReels(reelsResponse.data.content);
+          setShowReels(true);
+          setShowPosts(false);
+        } else {
+          setError("Failed to fetch reels");
+        }
       } else {
-        setError("Failed to fetch reels");
+        const reelsResponse = await userService.getReelsByUser(user.id, reelPage, 10, authToken);
+        console.log("Users: " + reelsResponse.data.content.length)
+        if (reelsResponse.success) {
+          setReels(reelsResponse.data.content);
+          setShowReels(true);
+          setShowPosts(false);
+        } else {
+          setError("Failed to fetch reels");
+        }
       }
     } catch (err) {
       setError("An error occurred while fetching reels");

@@ -111,6 +111,78 @@ class userService {
     }
   }
 
+  async getPostByUser(userId, page, size, token, timeout = 10000) {
+    if (userId === "") throw new Error("User ID is required for get user posts!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/${userId}/posts?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getReelsByUser(userId, page, size, token, timeout = 10000) {
+    if (userId === "") throw new Error("User ID is required for get user reels!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/${userId}/reels?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  } 
+
   async getMyReels(token, page, size, timeout = 1000) {
     if (token === "") throw new Error("Token is required for get user posts!");
     const controller = new AbortController();
@@ -230,18 +302,15 @@ class userService {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(
-        `${this.baseUrl}/search/recent`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          signal: controller.signal,
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/search/recent`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
       clearTimeout(timeoutId);
       if (!response.ok) {
         const error = await response.json();
@@ -301,8 +370,8 @@ class userService {
     }
   }
 
-  async isFollowingUser(userId, token, timeout = 10000) {
-    if (userId === "" || userId === null)
+  async isFollowingUser(followingUserId, token, timeout = 10000) {
+    if (followingUserId === "" || followingUserId === null)
       throw new Error("User ID is required for get following users!");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -338,7 +407,7 @@ class userService {
           error.name === "AbortError" ? "Request timed out" : error.message,
       };
     }
-  } 
+  }
 }
 
 export default new userService();
