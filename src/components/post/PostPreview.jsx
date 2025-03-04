@@ -12,18 +12,21 @@ import {
 import ReadMoreCaption from "./ReadMoreCaption";
 import userService from "../../services/userService";
 import Like from "../icons/Like";
+import Save from "../icons/Save";
 import useAuthToken from "../../hooks/useAuthToken";
 import { useConvertTime } from "../../hooks/useConvertTime";
 import useIsFollowing from "../../hooks/useIsFollowing";
 import PostInfo from "../popups/PostInfo";
 import postService from "../../services/postService";
-import Hls from "hls.js";
 import HlsVideoPlayer from "./HlsVideoPlayer";
 import ShowInfoBanner from "../popups/ShowInfoBanner";
+import commentService from "../../services/commentService";
+import { toast } from "react-toastify";
 
 function PostPreview({ post }) {
   const isFromFollowedUser = false;
   const [commentMsg, setCommentMsg] = useState("");
+  const [commentCount, setCommentCount] = useState(post.commentCount);
   const mediaRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
   const [error, setError] = useState(false);
@@ -33,7 +36,11 @@ function PostPreview({ post }) {
   const [showMoreActions, setShowMoreActions] = useState(false);
   const [postsMedia, setpostsMedia] = useState([]);
   const [isLikedPost, setIsLikedPost] = useState(false);
+  const [isSavedPost, setIsSavedPost] = useState(false);
   const [toggleLikeBtn, setToggleLikeBtn] = useState(0);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+  // const [stompClient, setStompClient] = useState(null);
+  // const [isConnect, setIsConnect] = useState(false);
   const authToken = useAuthToken();
 
   const scrollLeft = () => {
@@ -50,18 +57,98 @@ function PostPreview({ post }) {
     });
   };
 
-  const postComment = () => {
-    console.log("Post: " + commentMsg);
+  const postComment = async () => {
+    const response = await commentService.sendComment(
+      post.id,
+      commentMsg,
+      authToken
+    );
+    if (!response.success) {
+      toast.error(response.error);
+      setError(response.error);
+      return;
+    }
+    toast.success("Succfully post the comment!");
+    setCommentMsg("");
+    setCommentCount((prevCommentCount) => prevCommentCount + 1);
   };
 
   const likeBtnHandler = async () => {
+    // if (stompClient && stompClient.connected) {
+    //   stompClient.publish({
+    //     destination: `/app/${post.id}/like`,
+    //   });
+    // } else {
+    //   setError(new Error("WebSocket connection is not active.").message);
+    // }
     const response = await postService.likePost(post.id, authToken);
     if (!response.success) {
       setError(response.error);
       return;
     }
+    setLikeCount(response.data);
+    setIsLikedPost((prev) => !prev);
     setToggleLikeBtn((prev) => prev + 1);
   };
+
+  const clickSavedHandler = async () => {
+    const resposne = await postService.savePost(post.id, authToken);
+    if (!resposne.success) {
+      setError(resposne.error);
+      return;
+    }
+    console.log("resposne save: ", resposne);
+    setIsSavedPost((prev) => !prev);
+  };
+
+  // const connect = () => {
+  //   const sockjs = new SockJS("http://localhost:8080/api/v1/ws");
+  //   const temp = over(sockjs);
+  //   setStompClient(temp);
+
+  //   const headers = {
+  //     Authorization: `Bearer ${authToken}`,
+  //     "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+  //   }
+
+  //   temp.connect(headers, onConnect, onError);
+  // }
+
+  // const getCookies = (cookieName) => {
+  //   const value = `; ${document.cookie}`;
+  //   const parts = value.split(`; ${cookieName}=`)
+  //   if (parts.length === 2) {
+  //     return parts.pop().split(";").shift();
+  //   }
+  // }
+
+  // const onError = (error) => {
+  //   console.log("onError: ", error);
+  // }
+
+  // const onConnect = () => {
+  //   setIsConnect(true);
+  // }
+
+  // useEffect(() => {
+  //   if (post && stompClient) {
+  //     stompClient.send
+  //   }
+  // }, [post])
+
+  // useEffect(() => {
+  //   if (isConnect && stompClient) {
+  //     const subscription = stompClient.subscribe(`/topic/posts/likes/${post.id}`, );
+  //   }
+  // })
+
+  // useEffect(() => {
+  //   connect();
+  // }, []);
+
+  // const recivedLikes = (payload) => {
+  //   console.log("Playload: ", payload.body);
+  // }
 
   useEffect(() => {
     (async () => {
@@ -102,6 +189,14 @@ function PostPreview({ post }) {
             ]);
         });
       });
+
+      // check current post is saved
+      const savedRespose = await postService.isSavedPost(post.id, authToken);
+      if (!savedRespose.success) {
+        setError(savedRespose.error);
+        return;
+      }
+      setIsSavedPost(savedRespose.data);
     })();
   }, [post.user.username, authToken]);
 
@@ -112,6 +207,45 @@ function PostPreview({ post }) {
       setIsLikedPost(likeResponse.data);
     })();
   }, [toggleLikeBtn]);
+
+  // useEffect(() => {
+  //   console.log("try to connected")
+  //   const client = new Client({
+  //     brokerURL: "ws://localhost:8080/api/v1/ws",
+  //     connectHeaders: {
+  //       Authorization: `Bearer ${authToken}`,
+  //     },
+  //     reconnectDelay: 5000,
+  //     onConnect: () => {
+  //       console.log("Connected to WebSocket");
+  //       client.subscribe(`/topic/posts/likes/${post.id}`, (message) => {
+  //         const updatedLikeCount = JSON.parse(message.body);
+  //         console.log("Updated likes:", updatedLikeCount);
+  //         setLikeCount(updatedLikeCount);
+  //       });
+  //     },
+  //     onStompError: (error) => {
+  //       console.error("STOMP error:", error);
+  //       setError(`STOMP error: ${error.message || "STOMP protocol error."}`);
+  //     },
+  //     onWebSocketError: (error) => {
+  //       console.error("WebSocket error:", error);
+  //       setError(`WebSocket error: ${error.message || "Unable to connect to WebSocket server."}`);
+  //     },
+  //     onDisconnect: () => {
+  //       console.log("Disconnected from WebSocket");
+  //     },
+  //   });
+
+  //   client.activate();
+  //   setStompClient(client);
+
+  //   return () => {
+  //     if (client) {
+  //       client.deactivate();
+  //     }
+  //   };
+  // }, [authToken, post.id]);
 
   return (
     <div className="post" key={post.id}>
@@ -127,6 +261,7 @@ function PostPreview({ post }) {
           isFavorites={false}
           isFollowingPost={isFollowingUserPost}
           closeOptions={setShowMoreActions}
+          postId={post.id}
         />
       )}
       <div className="container">
@@ -269,27 +404,18 @@ function PostPreview({ post }) {
             <FontAwesomeIcon icon={faPaperPlane} className="icon" />
           </div>
           <div className="save">
-            <label className="ui-bookmark">
-              <input type="checkbox" />
-              <div className="bookmark">
-                <svg viewBox="0 0 32 32">
-                  <g>
-                    <path d="M27 4v27a1 1 0 0 1-1.625.781L16 24.281l-9.375 7.5A1 1 0 0 1 5 31V4a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4z"></path>
-                  </g>
-                </svg>
-              </div>
-            </label>
+            <Save isSaved={isSavedPost} onClick={clickSavedHandler} />
           </div>
         </div>
         <div className="likes">
-          <span>{post.likeCount} likes</span>
+          <span>{likeCount} likes</span>
         </div>
         <div className="caption">
           <ReadMoreCaption paragraph={post.caption || ""} />
         </div>
         <div className="comment-opt">
           <Link to={``} style={{ textDecoration: "none", color: "inherit" }}>
-            <span>View all {post.commentCount} comments</span>
+            <span>View all {commentCount} comments</span>
           </Link>
         </div>
         <div className="add-comment">

@@ -52,6 +52,7 @@ function Posts() {
       //   }
       //   return prevPosts;
       // });
+
       setPosts((prevPosts) => {
         const newPosts = response.data.content.filter(
           (newPost) => !prevPosts.some((prevPost) => prevPost.id === newPost.id)
@@ -83,7 +84,7 @@ function Posts() {
   return (
     <div className="posts">
       {posts.map((post) => (
-        <PostPreview key={post.id} post={post} />
+          <PostPreview key={post.id} post={post} />
       ))}
       {!isLastPage && loading && <Loading top={80} />}
     </div>

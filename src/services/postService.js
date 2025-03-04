@@ -1,5 +1,3 @@
-import useAuthToken from "../hooks/useAuthToken";
-
 class postService {
   baseUrl = "http://localhost:8080/api/v1/posts";
   mediaUrl = "http://localhost:8080/api/v1/media";
@@ -156,9 +154,9 @@ class postService {
     }
   }
 
-  async getPostById(postId, timeout = 10000) {
+  async getPostById(postId, token, timeout = 10000) {
     if ((postId === null, postId === ""))
-      throw new Error("Post Id is required for update the post!");
+      throw new Error("Post Id is required for get the post details!");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -166,8 +164,7 @@ class postService {
       const response = await fetch(`${this.baseUrl}/${postId}`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          Accpet: "application/json",
+          Authorization: `Bearer ${token}`
         },
         signal: controller.signal,
       });
@@ -178,7 +175,7 @@ class postService {
       return {
         success: true,
         status: response.status,
-        data: response.json(),
+        data: await response.json(),
       };
     } catch (error) {
       return {
@@ -331,6 +328,45 @@ class postService {
     }
   }
 
+  async isSavedPost(postId, token, timeout = 20000) {
+    if (postId === "" || postId === null)
+      throw new Error("PostId is required for get the saved post info!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/${postId}/isSaved`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const responseText = await response.text();
+      const isLiked = responseText === "true";
+      return {
+        success: true,
+        status: response.status,
+        data: isLiked,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
   async likePost(postId, token, timeout = 20000) {
     if (postId === "" || postId === null)
       throw new Error("PostId is required if you can to like this post!");
@@ -339,6 +375,43 @@ class postService {
 
     try {
       const response = await fetch(`${this.baseUrl}/${postId}/like`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.text(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  async savePost(postId, token, timeout = 20000) {
+    if (postId === "" || postId === null)
+      throw new Error("PostId is required if you can to save this post!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/${postId}/save`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

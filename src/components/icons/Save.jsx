@@ -1,10 +1,10 @@
 import React from "react";
 import "./Save.scss";
 
-function Save() {
+function Save({ isSaved, onClick }) {
   return (
     <label class="ui-bookmark">
-      <input type="checkbox" />
+      <input type="checkbox" checked={isSaved} onChange={onClick} />
       <div class="bookmark">
         <svg viewBox="0 0 32 32">
           <g>

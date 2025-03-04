@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import "./PostInfo.scss";
 import useClickOutside from "../../hooks/useClickOutside";
+import { useNavigate } from "react-router-dom";
 
-function PostInfo({ isFollowingPost, isFavorites, closeOptions }) {
+function PostInfo({ isFollowingPost, isFavorites, closeOptions, postId }) {
   const optionsRef = useRef(null);
+  const navigate = useNavigate();
 
   useClickOutside(optionsRef, () => closeOptions(false));
 
@@ -31,7 +33,7 @@ function PostInfo({ isFollowingPost, isFavorites, closeOptions }) {
             <span>Add to favorites</span>
           </div>
         )}
-        <div className="option">
+        <div className="option" onClick={() => navigate(`/post/${postId}`)}>
           <span>Go to post</span>
         </div>
         <div className="option">
