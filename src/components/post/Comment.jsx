@@ -43,7 +43,10 @@ function Comment({ comment }) {
       setCreatedAt(useConvertTime(comment.createdAt));
     })();
     (async () => {
-      const likeResponse = await commentService.isLikedComment(comment.id, authToken);
+      const likeResponse = await commentService.isLikedComment(
+        comment.id,
+        authToken
+      );
       if (!likeResponse.success) {
         toast.error(likeResponse.error);
         return;
@@ -52,12 +55,17 @@ function Comment({ comment }) {
     })();
   }, [comment]);
 
-  console.log("comment: ", comment);
-
   return (
     <div className="comment" key={comment.id}>
       <div className="user-profile">
-        <img src={userProfile} alt={comment.user.username} />
+        <img
+          src={
+            userProfile
+              ? userProfile
+              : "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+          }
+          alt={comment.user.username}
+        />
         <span>{comment.user.username}</span>
       </div>
       <div className="content">
@@ -65,7 +73,7 @@ function Comment({ comment }) {
       </div>
       <div className="meta">
         <div className="time">
-          <span>{createdAt}</span>
+          <span>{createdAt || "Just now"}</span>
         </div>
         <div className="likes">
           {likeCount > 0 && <span>{likeCount} like</span>}

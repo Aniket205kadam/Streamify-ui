@@ -1,63 +1,88 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./RightBar.scss";
 import { Link } from "react-router-dom";
+import useConnectedUser from "../../hooks/useConnectedUser";
+import userService from "../../services/userService";
+import { toast } from "react-toastify";
 
 function RightBar({ isBlur }) {
-  const connectedUser = {
-    id: "121212",
-    username: "aniket205kadam",
-    profileUrl:
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-    fullName: "Aniket Kadam",
+  // const connectedUser = {
+  //   id: "121212",
+  //   username: "aniket205kadam",
+  //   profileUrl:
+  //     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+  //   fullName: "Aniket Kadam",
+  // };
+
+  const connectedUser = useConnectedUser();
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [suggestedFriends, setSuggestedFriends] = useState([]);
+  const [suggestedFriendsProfile, setSuggestedFriendsProfile] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const userResposne = await userService.getUserByUsername(
+        connectedUser.username,
+        connectedUser.authToken
+      );
+      if (!userResposne.success) {
+        toast.error(userResposne.error);
+        return;
+      }
+      setFullName(userResposne.data.fullName);
+    })();
+
+    (async () => {
+      const friendsResponse = await userService.getSuggestedFriends(
+        connectedUser.authToken,
+        0,
+        5
+      );
+      if (!friendsResponse.success) {
+        toast.error(friendsResponse.error);
+        return;
+      }
+      setSuggestedFriends(friendsResponse.data.content);
+      console.log("HERE:", friendsResponse.data.content);
+      setLoading(false);
+    })();
+  }, []);
+
+  const getProfile = async (username) => {
+    const friendProfileResponse = await userService.getUserProfileByUsername(
+      username,
+      connectedUser.authToken
+    );
+    if (!friendProfileResponse.success) {
+      toast.error(friendProfileResponse.error);
+      return;
+    }
+    return URL.createObjectURL(friendProfileResponse.data);
   };
 
-  const suggestedFriends = [
-    {
-      user: {
-        id: "1",
-        username: "john_doe",
-        profileUrl: "https://randomuser.me/api/portraits/men/1.jpg",
-      },
-      followedBy: ["alice_wonder", "mike_ross", "emma_smith"],
-    },
-    {
-      user: {
-        id: "2",
-        username: "sarah_lee",
-        profileUrl: "https://randomuser.me/api/portraits/women/2.jpg",
-      },
-      followedBy: ["david_clark", "lucas_johnson"],
-    },
-    {
-      user: {
-        id: "3",
-        username: "mark_taylor",
-        profileUrl: "https://randomuser.me/api/portraits/men/3.jpg",
-      },
-      followedBy: ["sophia_miller", "jessica_jones", "daniel_brown"],
-    },
-    {
-      user: {
-        id: "4",
-        username: "olivia_white",
-        profileUrl: "https://randomuser.me/api/portraits/women/4.jpg",
-      },
-      followedBy: ["jack_wilson", "hannah_olsen"],
-    },
-  ];
+  useEffect(() => {
+    (async () => {
+      if (suggestedFriends) {
+        suggestedFriends.forEach(async (friend) => {
+          const profileUrl = await getProfile(friend.username);
+          setSuggestedFriendsProfile((prev) =>
+            prev ? [...prev, profileUrl] : [profileUrl]
+          );
+        });
+      }
+    })();
+  }, [suggestedFriends]);
 
   return (
     <div className={`rightBar ${isBlur ? "blurred" : ""}`}>
       <div className="container">
         {/* Connected User Section */}
         <div className="connected-user">
-          <img
-            src={connectedUser.profileUrl}
-            alt={`${connectedUser.fullName} profile`}
-          />
+          <img src={connectedUser.profileUrl} alt={`${fullName} profile`} />
           <div className="user-info">
             <span className="username">{connectedUser.username}</span>
-            <span className="fullName">{connectedUser.fullName}</span>
+            <span className="fullName">{fullName}</span>
           </div>
         </div>
         <div className="suggested-users">
@@ -67,29 +92,27 @@ function RightBar({ isBlur }) {
               See All
             </Link>
           </div>
-          {suggestedFriends.map((friend) => (
-            <div className="user" key={friend.user.id}>
+          {(suggestedFriends || []).map((friend, idx) => (
+            <div className="user" key={friend.id}>
               <div className="userInfo">
-                <Link className="profile" to={`/${friend.user.username}/`}>
+                <Link className="profile" to={`/profile/${friend.username}/`}>
                   {" "}
                   <img
-                    src={friend.user.profileUrl}
-                    alt={friend.user.username}
+                    src={
+                      suggestedFriendsProfile[idx] ||
+                      "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+                    }
+                    alt={friend.username}
                   />
                 </Link>
                 <div>
-                  <Link className="profile" to={`/${friend.user.username}/`}>
-                    <span className="username">{friend.user.username}</span>
+                  <Link className="profile" to={`/profile/${friend.username}/`}>
+                    <span className="username">{friend.username}</span>
                   </Link>
                   <br />
-                  {friend.followedBy.length > 0 && (
-                    <span className="followedBy">
-                      Followed by {friend.followedBy[0]}
-                      {friend.followedBy.length > 1 && (
-                        <span> + {friend.followedBy.length - 1}</span>
-                      )}
-                    </span>
-                  )}
+                  <span className="follower-count">
+                    Followers: {friend.followerCount}
+                  </span>
                 </div>
               </div>
               <button

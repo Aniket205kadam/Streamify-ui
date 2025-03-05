@@ -163,7 +163,7 @@ function LeftBar({
           </div>
 
           <div className="user" onClick={() => navigate(`/profile/${connectedUser.username}`)}>
-            {currentLocation.pathname === "" && !isOpenSearchBox ? (
+            {currentLocation.pathname === `/profile/${connectedUser.username}` ? (
               <>
                 <img src={connectedUser.profileUrl} alt={connectedUser.username + " profile"} />
                 <span style={{ fontWeight: "bold" }}>Profile</span>

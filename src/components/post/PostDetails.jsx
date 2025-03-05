@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -38,6 +38,7 @@ function PostDetails() {
   const [commentMsg, setCommentMsg] = useState("");
   const [commentCount, setCommentCount] = useState(0);
   const [postsMedia, setPostsMedia] = useState([]);
+  const [isSaved, setIsSaved] = useState(false);
 
   // Fetch post details, comments, and like status
   useEffect(() => {
@@ -47,7 +48,10 @@ function PostDetails() {
           postId,
           connectedUser.authToken
         );
-        if (!postResponse.success) throw new Error(postResponse.error);
+        if (!postResponse.success) {
+          toast.error(postResponse.error);
+          return;
+        }
 
         setPost(postResponse.data);
         setLikeCount(postResponse.data.likeCount);
@@ -55,9 +59,15 @@ function PostDetails() {
 
         const commentResponse = await commentService.getCommentsOnPost(
           postId,
+          0,
+          10,
           connectedUser.authToken
         );
-        if (!commentResponse.success) throw new Error(commentResponse.error);
+
+        if (!commentResponse.success) {
+          toast.error(commentResponse.error);
+          return;
+        }
 
         setPostComments(commentResponse.response.content);
 
@@ -65,9 +75,22 @@ function PostDetails() {
           postId,
           connectedUser.authToken
         );
-        if (!likeResponse.success) throw new Error(likeResponse.error);
+        if (!likeResponse.success) {
+          toast.error(likeResponse.error);
+          return;
+        }
 
         setIsLiked(likeResponse.data);
+
+        const saveResposne = await postService.isSavedPost(
+          postId,
+          connectedUser.authToken
+        );
+        if (!saveResposne.success) {
+          toast.error(saveResposne.error);
+          return;
+        }
+        setIsSaved(saveResposne.data);
       } catch (error) {
         toast.error(error.message);
       } finally {
@@ -118,14 +141,6 @@ function PostDetails() {
     fetchPostMedia();
   }, [post, connectedUser.authToken]);
 
-  const navigateContent = (direction) => {
-    setContentIdx((prevIdx) =>
-      direction === "left"
-        ? (prevIdx - 1 + post.postMedia.length) % post.postMedia.length
-        : (prevIdx + 1) % post.postMedia.length
-    );
-  };
-
   const toggleLeft = () => {
     if (contentIdx != 0) {
       setContentIdx((prevIdx) => prevIdx - 1);
@@ -140,20 +155,23 @@ function PostDetails() {
 
   const sendComment = async () => {
     try {
-      const response = await commentService.sendComment(
+      const commentResposne = await commentService.sendComment(
         post.id,
         commentMsg,
         connectedUser.authToken
       );
-      if (!response.success) throw new Error(response.error);
+      if (!commentResposne.success) {
+        toast.error(commentResposne.error);
+        return;
+      }
 
       toast.success("Successfully posted the comment!");
       setCommentCount((prev) => prev + 1);
 
       const recentComment = {
-        id: response.data,
+        id: commentResposne.response,
         content: commentMsg,
-        createdAt: Date.now(),
+        createdAt: null,
         user: connectedUser,
         likes: 0,
         replies: 0,
@@ -173,10 +191,29 @@ function PostDetails() {
         post.id,
         connectedUser.authToken
       );
-      if (!response.success) throw new Error(response.error);
+      if (!response.success) {
+        toast.error(response.error);
+        return;
+      }
 
       setLikeCount(response.data);
       setIsLiked((prev) => !prev);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const saveBtnHandler = async () => {
+    try {
+      const response = await postService.savePost(
+        post.id,
+        connectedUser.authToken
+      );
+      if (!response.success) {
+        toast.error(response.error);
+        return;
+      }
+      setIsSaved((prev) => !prev);
     } catch (error) {
       toast.error(error.message);
     }
@@ -197,7 +234,14 @@ function PostDetails() {
           )}
           <div className="content">
             {post.postMedia[contentIdx].type.startsWith("image/") ? (
-              <img src={postsMedia[contentIdx]} alt={post.user.username} />
+              <img
+                src={
+                  postsMedia[contentIdx]
+                    ? postsMedia[contentIdx]
+                    : "https://i.pinimg.com/736x/4a/02/68/4a02685c212b6e1ea6c8dcc078a1c63c.jpg"
+                }
+                alt={post.user.username}
+              />
             ) : (
               <video src={postsMedia[contentIdx]} autoPlay controls />
             )}
@@ -210,14 +254,25 @@ function PostDetails() {
             )}
           {post.postMedia.length > 1 && (
             <div className="image-position">
-              <GenerateDots length={post.postMedia.length} idx={contentIdx} />
+              <GenerateDots
+                length={post.postMedia.length}
+                idx={contentIdx}
+                setContentIdx={setContentIdx}
+              />
             </div>
           )}
         </div>
         <div className="right">
           <div className="post-owner">
             <div className="user-profile">
-              <img src={postOwnerProfile} alt={post.user.username} />
+              <img
+                src={
+                  postOwnerProfile
+                    ? postOwnerProfile
+                    : "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+                }
+                alt={post.user.username}
+              />
             </div>
             <div className="user-name">
               <div className="name">{post.user.username}</div>
@@ -240,7 +295,11 @@ function PostDetails() {
               )}
             </div>
           </div>
-          <CommentSection postComments={postComments} />
+          <CommentSection
+            postId={post.id}
+            postComments={postComments}
+            setPostComments={setPostComments}
+          />
           {connectedUser.username === post.user.username && (
             <div className="owner-option">
               <hr />
@@ -258,7 +317,10 @@ function PostDetails() {
               <FontAwesomeIcon icon={faPaperPlane} className="icon" />
             </div>
             <div className="save">
-              <Save />
+              <Save
+                isSaved={isSaved}
+                onClick={saveBtnHandler}
+              />
             </div>
           </div>
           <div className="info">
@@ -351,8 +413,7 @@ const SimilarPost = ({ post }) => {
         toast.error(postResposne.error);
         return;
       }
-      console.log("Similar: ", postResposne.data);
-      setPosts(postResposne.data.content.filter(p => p.id != post.id));
+      setPosts(postResposne.data.content.filter((p) => p.id != post.id));
       setLoading(false);
     })();
   }, [post]);
@@ -360,32 +421,90 @@ const SimilarPost = ({ post }) => {
   return (
     <div className="similar-post">
       <hr />
-      <div className="user-account-like">
-        <span>
-          More Posts from
-          <strong onClick={() => navigate(`/profile/${post.user.username}`)}>
-            {post.user.username}
-          </strong>
-        </span>
-      </div>
-      {loading ? (
-        <h1>Loading...</h1>
-      ) : (
-        <div className="content">
-          {(posts || []).map((post) => (
-            <div className="post-card">
-              <PostCard post={post} key={post.id} />
-            </div>
-          ))}
+      {posts.length > 0 && (
+        <div>
+          <div className="user-account-like">
+            <span>
+              More Posts from
+              <strong
+                onClick={() => navigate(`/profile/${post.user.username}`)}
+              >
+                {post.user.username}
+              </strong>
+            </span>
+          </div>
+          <>
+            {loading ? (
+              <h1>Loading...</h1>
+            ) : (
+              <div className="content">
+                {(posts || []).map((post) => (
+                  <div className="post-card" onClick={() => navigate(`/post/${post.id}`)}>
+                    <PostCard post={post} key={post.id} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         </div>
       )}
     </div>
   );
 };
 
-const CommentSection = ({ postComments }) => {
+const CommentSection = ({ postId, postComments, setPostComments }) => {
+  const commentsRef = useRef(null);
+  const [page, setPage] = useState(0);
+  const [isLastPage, setIsLastPage] = useState(false);
+  const connectedUser = useConnectedUser();
+
+  const handleInfiniteScroll = useCallback(() => {
+    if (commentsRef.current) {
+      const { scrollTop, clientHeight, scrollHeight } = commentsRef.current;
+      if (Math.ceil(scrollTop + clientHeight) >= scrollHeight) {
+        if (!isLastPage) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (page === 0 || isLastPage) return;
+    (async () => {
+      const commentResponse = await commentService.getCommentsOnPost(
+        postId,
+        page,
+        10,
+        connectedUser.authToken
+      );
+      if (!commentResponse.success) {
+        toast.error(commentResponse.error);
+        return;
+      }
+      setPostComments((prevComments) => [
+        ...prevComments,
+        ...commentResponse.response.content,
+      ]);
+      setIsLastPage(commentResponse.response.last);
+    })();
+  }, [page]);
+
+  useEffect(() => {
+    if (postComments && commentsRef.current) {
+      const refElement = commentsRef.current;
+      refElement.addEventListener("scroll", handleInfiniteScroll, {
+        passive: true,
+      });
+
+      return () => {
+        refElement.removeEventListener("scroll", handleInfiniteScroll);
+      };
+    }
+  }, [postComments, handleInfiniteScroll]);
+
   return (
-    <div className="comment-section">
+    <div className="comment-section" ref={commentsRef}>
       {postComments.map((comment) => (
         <Comment key={comment.id} comment={comment} />
       ))}
@@ -393,12 +512,12 @@ const CommentSection = ({ postComments }) => {
   );
 };
 
-const GenerateDots = ({ length, idx }) => {
+const GenerateDots = ({ length, idx, setContentIdx }) => {
   if (length === 1) return null;
   return (
     <div className="post-state">
       {Array.from({ length }, (_, index) => (
-        <div key={index} className="point">
+        <div key={index} className="point" onClick={() => setContentIdx(index)}>
           {index === idx ? (
             <FontAwesomeIcon icon={faCircle} />
           ) : (

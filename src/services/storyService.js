@@ -78,6 +78,41 @@ class storyService {
       };
     }
   }
+
+  async getFollowingsStories(token, timeout = 1000) {
+    if (!token) throw new Error("Authentication token is missing we need this to connect to the server!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/get/followers`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
 }
 
 export default new storyService();

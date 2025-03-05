@@ -11,11 +11,13 @@ import {
 import postService from "../../services/postService";
 import useAuthToken from "../../hooks/useAuthToken";
 import ShowInfoBanner from "../popups/ShowInfoBanner";
+import { useNavigate } from "react-router-dom";
 
 function PostCard({ post }) {
   const authToken = useAuthToken();
   const [firstPostImage, setFirstPostImage] = useState();
   const [error, setError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -30,7 +32,7 @@ function PostCard({ post }) {
 
 
   return (
-    <div className="post-card" key={post.id}>
+    <div className="post-card" key={post.id} onClick={() => navigate(`/post/${post.id}`)}>
       {error && <ShowInfoBanner msg={`🪲 ${error}`} />}
       {post.postMedia[0].type.startsWith("image/") ? (
         <img

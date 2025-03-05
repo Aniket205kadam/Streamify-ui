@@ -2,6 +2,7 @@ class commentService {
   baseUrl = "http://localhost:8080/api/v1/posts";
 
   async sendComment(postId, content, token, timeout = 20000) {
+    console.log("comment send")
     if (postId === null)
       throw new Error("Post ID is required to send the comment");
     if (content === "") throw new Error("Empty comment is not posted!");
@@ -41,14 +42,14 @@ class commentService {
     }
   }
 
-  async getCommentsOnPost(postId, token, timeout = 20000) {
+  async getCommentsOnPost(postId, page, size, token, timeout = 20000) {
     if (postId === null)
       throw new Error("Post ID is required to send the comment");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}/${postId}/comments`, {
+      const response = await fetch(`${this.baseUrl}/${postId}/comments?page=${page}&size=${size}`, {
         method: "GET",
         headers: {
           Accept: "application/json",
