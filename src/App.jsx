@@ -27,6 +27,7 @@ function App() {
   const themeSwitcherRef = useRef(null);
   const addPostRef = useRef(null);
   const addStoryRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useClickOutside(searchRef, () => setShowSearchBox(false));
   useClickOutside(moreOptionsRef, () => setShowMoreOption(false));
@@ -57,7 +58,7 @@ function App() {
         <div
           className={`content ${showSearchBox ? "blurred" : ""}`}
           style={{
-            flex: showRightBar ? "5" : "8.6",
+            flex: showRightBar ? "7" : "8.6",
           }}
         >
           <Outlet
@@ -67,7 +68,9 @@ function App() {
         {showRightBar && <RightBar isBlur={showSearchBox} />}
       </div>
 
-      {showSearchBox && <Search ref={searchRef} setShowSearchBox={setShowSearchBox} />}
+      {showSearchBox && (
+        <Search ref={searchRef} setShowSearchBox={setShowSearchBox} />
+      )}
       {showMoreOptions && (
         <MoreOptions
           ref={moreOptionsRef}

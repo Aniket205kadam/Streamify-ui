@@ -71,12 +71,18 @@
       padding: 10px;
       border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out, background 0.3s;
+      // transition: transform 0.2s ease-in-out, background 0.3s;
 
       // &:hover {
       //   transform: scale(1.1);
       //   background: rgba(255, 255, 255, 0.2);
       // }
+
+      .heart-container {
+        .svg-outline {
+          fill: black;
+        }
+      }
 
       span {
         font-size: 12px;

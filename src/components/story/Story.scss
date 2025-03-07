@@ -1,154 +1,255 @@
-$primary-color: #000;
-$secondary-color: #fff;
-$accent-color: #3897f0;
-$border-color: #dbdbdb;
-
+// Story.scss
 .story-container {
+  top: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100vh;
+  background-color: #000;
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: $primary-color;
-  font-family: "Roboto", sans-serif;
 
+  .story-message {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9); 
+    color: #333;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 1000;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: translate(-50%, -10px);
+  }
+  
   .story-main {
-    width: 100%;
-    max-width: 400px;
-    height: 90vh;
-    background-color: $primary-color;
-    border-radius: 10px;
-    overflow: hidden;
     position: relative;
+    width: 100%;
+    height: 89%;
+    max-width: 375px;
+    background-color: #000;
+    overflow: hidden;
 
     .story-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
+      width: 100%;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       z-index: 2;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0) 100%
+      );
 
       .user-info {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
 
         img {
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
-          border: 2px solid $accent-color;
+          object-fit: cover;
+          border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .username {
-          color: $secondary-color;
+          color: white;
           font-size: 14px;
           font-weight: 500;
         }
 
         .timestamp {
-          color: rgba($secondary-color, 0.8);
+          color: rgba(255, 255, 255, 0.8);
           font-size: 12px;
+          margin-left: 8px;
         }
       }
 
       .actions {
         display: flex;
+        gap: 12px;
         align-items: center;
-        gap: 15px;
 
         .audio,
         .play-pause,
         .more {
+          color: white;
           cursor: pointer;
-          color: $secondary-color;
-          font-size: 18px;
+          padding: 8px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s ease;
 
           &:hover {
-            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.2);
+          }
+
+          svg {
+            font-size: 16px;
           }
         }
       }
     }
 
     .story-content {
+      position: relative;
       width: 100%;
       height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
+      .left,
       .right {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
         position: absolute;
-        top: 45%;
-        left: 90%;
-        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
         z-index: 2;
-        font-size: 24px;
-        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        svg {
+          font-size: 18px;
+        }
       }
 
       .left {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        position: absolute;
-        top: 45%;
-        left: 0;
-        right: 0;
-        z-index: 2;
-        font-size: 24px;
-        color: #ffffff;
+        left: 16px;
+      }
+
+      .right {
+        right: 16px;
       }
 
       img,
       video {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        background-color: #2a2828;
+      }
+
+      video {
+        transform: translateZ(0);
       }
     }
 
     .story-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
       position: absolute;
       bottom: 0;
       left: 0;
-      right: 0;
+      width: 100%;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
       z-index: 2;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0) 100%
+      );
 
       input {
         flex: 1;
-        padding: 8px 12px;
-        border: 1px solid $border-color;
-        border-radius: 20px;
-        background-color: rgba($secondary-color, 0.1);
-        color: $secondary-color;
+        padding: 12px 16px;
+        border-radius: 24px;
+        border: none;
+        background: rgba(255, 255, 255, 0.9);
         font-size: 14px;
-        outline: none;
+        color: #262626;
+
+        &:focus {
+          outline: none;
+          background: white;
+        }
 
         &::placeholder {
-          color: rgba($secondary-color, 0.7);
+          color: #8e8e8e;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .story-container {
+    .story-main {
+      max-width: 100%;
+
+      .story-header {
+        padding: 12px;
+
+        .user-info {
+          img {
+            width: 28px;
+            height: 28px;
+          }
+
+          .username {
+            font-size: 13px;
+          }
+
+          .timestamp {
+            font-size: 11px;
+          }
+        }
+
+        .actions {
+          gap: 8px;
+
+          .audio,
+          .play-pause,
+          .more {
+            width: 32px;
+            height: 32px;
+
+            svg {
+              font-size: 14px;
+            }
+          }
         }
       }
 
-      .Like {
-        cursor: pointer;
-        color: $secondary-color;
-        font-size: 18px;
-        margin-left: 10px;
+      .story-footer {
+        padding: 12px;
 
-        &:hover {
-          opacity: 0.8;
+        input {
+          padding: 10px 14px;
+          font-size: 13px;
         }
       }
     }

@@ -10,15 +10,14 @@ import { Link, useNavigate } from "react-router-dom";
 import useConnectedUser from "../../hooks/useConnectedUser";
 import storyService from "../../services/storyService";
 import userService from "../../services/userService";
-import ShowInfoBanner from "../popups/ShowInfoBanner";
 import { toast } from "react-toastify";
 
 function Stories({ showAddStoryBox }) {
   const connectedUser = useConnectedUser();
   const [stories, setStories] = useState([]);
-  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [connectedUserHasStory, setConnectedUserHasStory] = useState(false);
+  const [usersProfiles, setUsersProfiles] = useState({});
   const storiesRef = useRef(null);
   const navigate = useNavigate();
 
@@ -34,78 +33,25 @@ function Stories({ showAddStoryBox }) {
     }
   };
 
-  // const stories = [
-  //   {
-  //     id: "1",
-  //     username: "john_doe",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: false,
-  //   },
-  //   {
-  //     id: "2",
-  //     username: "emma_smith",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: true,
-  //   },
-  //   {
-  //     id: "3",
-  //     username: "michael_jordan",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: false,
-  //   },
-  //   {
-  //     id: "4",
-  //     username: "sophia_wilson",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: true,
-  //   },
-  //   {
-  //     id: "5",
-  //     username: "david_brown",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/2589650/pexels-photo-2589650.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: false,
-  //   },
-  //   {
-  //     id: "6",
-  //     username: "lisa_miller",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/2100063/pexels-photo-2100063.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: false,
-  //   },
-  //   {
-  //     id: "7",
-  //     username: "mark_white",
-  //     profileUrl:
-  //       "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600",
-  //     allStoriesSeen: true,
-  //   },
-  // ];
-
   useEffect(() => {
-    (async function () {
-      setError(false);
+    (async () => {
       const { success, error, data } =
         await storyService.isConnectedUserHasStory(connectedUser.authToken);
       if (!success) {
-        setError(error);
+        toast.error(error);
         return;
       }
-      setConnectedUserHasStory(data === "true" ? true : false);
+      console.log("Userhas story: " + data === "true")
+      console.log("Userhas story: " + typeof data)
+      setConnectedUserHasStory(data === "true");
     })();
-  }, [connectedUser]);
+  }, [connectedUser.authToken]);
 
   useEffect(() => {
-    // setLoading(false);
     (async () => {
       const storiesResponse = await storyService.getFollowingsStories(
         connectedUser.authToken
       );
-      console.log("story: ", storiesResponse.data);
       if (!storiesResponse.success) {
         toast.error(storiesResponse.error);
         return;
@@ -113,40 +59,33 @@ function Stories({ showAddStoryBox }) {
       setStories(storiesResponse.data);
       setLoading(false);
     })();
-  }, []);
-
-  const getUserProfile = async (username) => {
-    const userResposne = await userService.getUserProfileByUsername(
-      username,
-      connectedUser.authToken
-    );
-    if (!userResposne.success) {
-      toast.error(userResposne.error);
-      return;
-    }
-    return URL.createObjectURL(userResposne.data);
-  };
-
-  const [usersProfiles, setUsersProfiles] = useState([]);
+  }, [connectedUser.authToken]);
 
   useEffect(() => {
-    if (stories) {
-      stories.map((story) => {
-        (async () => {
-          const profileUrl = await getUserProfile(story.username);
-          setUsersProfiles((prev) => [...prev, profileUrl]);
-        })();
-      });
+    if (stories.length > 0) {
+      const fetchProfiles = async () => {
+        const profiles = {};
+        for (const story of stories) {
+          try {
+            const userResponse = await userService.getUserProfileByUsername(
+              story.username,
+              connectedUser.authToken
+            );
+            if (userResponse.success) {
+              profiles[story.username] = URL.createObjectURL(userResponse.data);
+            }
+          } catch (error) {
+            toast.error("Failed to fetch user profile.");
+          }
+        }
+        setUsersProfiles(profiles);
+      };
+      fetchProfiles();
     }
-  }, [stories]);
+  }, [stories, connectedUser.authToken]);
 
   return (
-    <div className="stories-container">
-      {error && (
-        <ShowInfoBanner
-          msg={"⚠️ Something went wrong! Error details: " + error}
-        />
-      )}
+    <div>
       {stories.length > 6 && (
         <button className="scroll-btn left" onClick={scrollLeft}>
           <FontAwesomeIcon icon={faChevronLeft} />
@@ -154,46 +93,35 @@ function Stories({ showAddStoryBox }) {
       )}
 
       <div className="stories" ref={storiesRef}>
-        <div
-          className={`user-story ${connectedUserHasStory && "user-has-story"}`}
-        >
-          <img
-            src={connectedUser.profileUrl}
-            alt={connectedUser.username + "profile"}
-            onClick={() => navigate(`/my-stories`)}
-          />
+        <div className={`user-story ${connectedUserHasStory ? "has-story" : ""}`}>
+          <div className="story-circle">
+            <img
+              src={connectedUser.profileUrl}
+              alt={connectedUser.username}
+              onClick={() => navigate(`/my-stories`)}
+            />
+            <button className="add-story-btn" onClick={showAddStoryBox}>
+              <FontAwesomeIcon icon={faPlus} />
+            </button>
+          </div>
           <span>{connectedUser.username}</span>
-          <button className="add-story-btn" onClick={showAddStoryBox}>
-            <FontAwesomeIcon icon={faPlus} />
-          </button>
         </div>
-        {!loading && (
-          <>
-            {stories.map((story, idx) => (
-              <Link
-                to={`stories/${story.username}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div
-                  className={`story ${story.allStoriesSeen ? "seen" : ""}`}
-                  key={story.id}
-                >
-                  <div className="profile-border">
-                    <img
-                      src={
-                        usersProfiles[idx]
-                          ? usersProfiles[idx]
-                          : "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
-                      }
-                      alt={`${story.username} profile`}
-                    />
-                  </div>
-                  <span>{story.username}</span>
-                </div>
-              </Link>
-            ))}
-          </>
-        )}
+
+        {!loading && stories.map((story) => (
+          <Link
+            key={story.id}
+            to={`/stories/${story.username}`}
+            className="story-item"
+          >
+            <div className={`story-circle ${story.allStoriesSeen ? "seen" : ""}`}>
+              <img
+                src={usersProfiles[story.username] || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
+                alt={story.username}
+              />
+            </div>
+            <span>{story.username}</span>
+          </Link>
+        ))}
       </div>
 
       {stories.length > 6 && (

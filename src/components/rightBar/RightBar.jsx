@@ -86,12 +86,14 @@ function RightBar({ isBlur }) {
           </div>
         </div>
         <div className="suggested-users">
-          <div className="header">
-            <span>Suggestions For You</span>
-            <Link to="/explore/people/" className="see-all">
-              See All
-            </Link>
-          </div>
+          {suggestedFriends.length > 0 && (
+            <div className="header">
+              <span>Suggestions For You</span>
+              <Link to="/explore/people/" className="see-all">
+                See All
+              </Link>
+            </div>
+          )}
           {(suggestedFriends || []).map((friend, idx) => (
             <div className="user" key={friend.id}>
               <div className="userInfo">

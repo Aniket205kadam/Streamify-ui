@@ -4,6 +4,8 @@ import PostPreview from "../post/PostPreview";
 import Loading from "../icons/Loading";
 import postService from "../../services/postService";
 import useAuthToken from "../../hooks/useAuthToken";
+import NotFoundTv from "../3D-componets/NotFoundTv"
+import DogAnimation from "../3D-componets/dogAnimation";
 
 function Posts() {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -15,6 +17,7 @@ function Posts() {
   const [error, setError] = useState(false);
   const [isLastPage, setIsLastPage] = useState(false);
   const authToken = useAuthToken();
+  const [noPost, setNoPost] = useState(false);
 
   const handleInfiniteScroll = async () => {
     if (
@@ -37,21 +40,15 @@ function Posts() {
         size,
         authToken
       );
-      console.log("response:", response.data.last)
       if (!response.success) {
         setError(response.error);
         setLoading(false);
         return;
       }
 
-      // setPosts((prevPosts) => {
-      //   if (prevPosts && response.data.content) {
-      //     return [...prevPosts, ...response.data.content];
-      //   } else if (response.data.content) {
-      //     return [...response.data.content];
-      //   }
-      //   return prevPosts;
-      // });
+      if (response.data.content.length === 0 && response.data.first) {
+        setNoPost(true);
+      }
 
       setPosts((prevPosts) => {
         const newPosts = response.data.content.filter(
@@ -80,6 +77,14 @@ function Posts() {
   if (start) {
     return <h1>Loading...</h1>;
   }
+
+  // if (!start && noPost) {
+  //   return (
+  //     <div className="no-post">
+  //       <DogAnimation />
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="posts">

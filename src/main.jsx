@@ -18,6 +18,8 @@ import VerificationPage from "./pages/register/VerificationPage.jsx";
 import OwnStories from "./components/stories/OwnStories.jsx";
 import PostDetails from "./components/post/PostDetails.jsx";
 import { Bounce, ToastContainer } from "react-toastify";
+import StoriesPage from "./components/stories/StoriesPage.jsx";
+import DogAnimation from "./components/3D-componets/dogAnimation.jsx";
 
 const router = createBrowserRouter([
   {
@@ -52,10 +54,14 @@ const router = createBrowserRouter([
         path: "/post/:postId",
         element: <PostDetails />
       },
-      // {
-      //   path: "/test",
-      //   element: <OwnStories />,
-      // },
+      {
+        path: "/stories/:username",
+        element: <StoriesPage />
+      },
+      {
+        path: "/test",
+        element: <DogAnimation />
+      }
     ],
   },
   {

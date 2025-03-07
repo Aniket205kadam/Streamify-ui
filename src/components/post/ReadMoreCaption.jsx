@@ -1,47 +1,47 @@
 import React, { useState } from "react";
 import "./PostPreview.scss";
 
-function ReadMoreCaption({ paragraph }) {
+function ReadMoreCaption({ paragraph = "" }) {
+  if (!paragraph || typeof paragraph !== "string") return null;
+  
   const [isExpanded, setIsExpanded] = useState(false);
-  const previewParagraph = paragraph.slice(0, 100);
+  const maxLength = 100;
+  const hashIndex = paragraph.indexOf("#");
+  
+  // Safe string operations
+  const previewText = paragraph.slice(0, maxLength);
+  const hasHashTag = hashIndex > -1;
+  const mainText = hasHashTag ? paragraph.slice(0, hashIndex) : paragraph;
+  const hashTags = hasHashTag ? paragraph.slice(hashIndex) : "";
 
   return (
     <div className="read-more-caption">
-      {paragraph.length > 100 ? (
+      {paragraph.length > maxLength ? (
         <div>
-          {isExpanded
-            ? paragraph.substring(0, paragraph.indexOf("#"))
-            : previewParagraph + "... "}
-          <br />
-          {isExpanded &&
-          paragraph.substring(0, paragraph.indexOf("#")).length > 0 ? (
+          {isExpanded ? mainText : `${previewText}... `}
+          {hasHashTag && (
             <span style={{ color: "#6ec4fa" }}>
-              {paragraph.substring(paragraph.indexOf("#"))}
+              {isExpanded ? hashTags : ""}
             </span>
-          ) : null}
-          {!isExpanded ? (
-            <button className="more-btn" onClick={() => setIsExpanded(true)}>
-              more
-            </button>
-          ) : (
-            <button className="more-btn" onClick={() => setIsExpanded(false)}>
-              less
-            </button>
           )}
+          <button 
+            className="more-btn" 
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            {isExpanded ? "less" : "more"}
+          </button>
         </div>
       ) : (
-        <p>
-          {paragraph.includes("#") ? (
-            <div>
-              <p>{paragraph.substring(0, paragraph.indexOf("#"))}</p>
-              <p style={{ color: "#388ff2" }}>
-                {paragraph.substring(paragraph.indexOf("#"))}
-              </p>
-            </div>
+        <div>
+          {hasHashTag ? (
+            <>
+              <div>{mainText}</div>
+              <div style={{ color: "#388ff2" }}>{hashTags}</div>
+            </>
           ) : (
             <div>{paragraph}</div>
           )}
-        </p>
+        </div>
       )}
     </div>
   );

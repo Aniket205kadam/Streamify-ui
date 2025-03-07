@@ -8,7 +8,18 @@ import {
   faPaperPlane,
   faChevronLeft,
   faChevronRight,
+  faVolumeHigh,
+  faVolumeXmark,
+  faCirclePlay,
+  faCirclePause,
+  faCircle,
+  faFaceSmile,
+  faPlayCircle,
+  faPauseCircle,
+  faVolumeMute,
+  faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
+import { faCircle as faCircleEmpty } from "@fortawesome/free-regular-svg-icons";
 import ReadMoreCaption from "./ReadMoreCaption";
 import userService from "../../services/userService";
 import Like from "../icons/Like";
@@ -22,13 +33,17 @@ import HlsVideoPlayer from "./HlsVideoPlayer";
 import ShowInfoBanner from "../popups/ShowInfoBanner";
 import commentService from "../../services/commentService";
 import { toast } from "react-toastify";
+import EmojiPicker from "emoji-picker-react";
+import useClickOutside from "../../hooks/useClickOutside";
 
 function PostPreview({ post }) {
   const isFromFollowedUser = false;
   const [commentMsg, setCommentMsg] = useState("");
   const [commentCount, setCommentCount] = useState(post.commentCount);
   const mediaRef = useRef(null);
+  const emojiRef = useRef(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState(false);
   const [userProfile, setUserProfile] = useState("");
   const [createdAt, setCreatedAt] = useState("");
@@ -39,22 +54,38 @@ function PostPreview({ post }) {
   const [isSavedPost, setIsSavedPost] = useState(false);
   const [toggleLikeBtn, setToggleLikeBtn] = useState(0);
   const [likeCount, setLikeCount] = useState(post.likeCount);
-  // const [stompClient, setStompClient] = useState(null);
-  // const [isConnect, setIsConnect] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [isOpenEmojiPicker, setIsOpenEmojiPicker] = useState(false);
   const authToken = useAuthToken();
+  const videoRef = useRef(null);
+  const [contentIdx, setContentIdx] = useState(0);
+
+  useClickOutside(mediaRef, () => setIsOpenEmojiPicker(false));
 
   const scrollLeft = () => {
+    if (contentIdx != 0) {
+      setContentIdx((prevIdx) => prevIdx - 1);
+    }
     mediaRef.current.scrollBy({
       left: -mediaRef.current.clientWidth,
       behavior: "smooth",
     });
+    if (currentIdx != post.postMedia.length - 1) {
+      setCurrentIdx((prevIdx) => prevIdx + 1);
+    }
   };
 
   const scrollRight = () => {
+    if (contentIdx < (post.postMedia.length - 1)) {
+      setContentIdx((prevIdx) => prevIdx + 1);
+    }
     mediaRef.current.scrollBy({
       left: mediaRef.current.clientWidth,
       behavior: "smooth",
     });
+    if (currentIdx != 0) {
+      setCurrentIdx((prevIdx) => prevIdx - 1);
+    }
   };
 
   const postComment = async () => {
@@ -74,13 +105,6 @@ function PostPreview({ post }) {
   };
 
   const likeBtnHandler = async () => {
-    // if (stompClient && stompClient.connected) {
-    //   stompClient.publish({
-    //     destination: `/app/${post.id}/like`,
-    //   });
-    // } else {
-    //   setError(new Error("WebSocket connection is not active.").message);
-    // }
     const response = await postService.likePost(post.id, authToken);
     if (!response.success) {
       setError(response.error);
@@ -101,54 +125,25 @@ function PostPreview({ post }) {
     setIsSavedPost((prev) => !prev);
   };
 
-  // const connect = () => {
-  //   const sockjs = new SockJS("http://localhost:8080/api/v1/ws");
-  //   const temp = over(sockjs);
-  //   setStompClient(temp);
+  const loadPostContent = async () => {
+    const mediaPromises = post.postMedia.map(async (postMedia) => {
+      const response = await postService.getPostMedia(postMedia.id, authToken);
+      if (!response.success) {
+        setError(response.error);
+        return null;
+      }
+      return { id: postMedia.id, url: URL.createObjectURL(response.data) };
+    });
 
-  //   const headers = {
-  //     Authorization: `Bearer ${authToken}`,
-  //     "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
-  //   }
+    // Wait for all media URLs to be resolved
+    const mediaResults = await Promise.all(mediaPromises);
 
-  //   temp.connect(headers, onConnect, onError);
-  // }
+    // Filter out any null values (failed requests)
+    const validMedia = mediaResults.filter((media) => media !== null);
 
-  // const getCookies = (cookieName) => {
-  //   const value = `; ${document.cookie}`;
-  //   const parts = value.split(`; ${cookieName}=`)
-  //   if (parts.length === 2) {
-  //     return parts.pop().split(";").shift();
-  //   }
-  // }
-
-  // const onError = (error) => {
-  //   console.log("onError: ", error);
-  // }
-
-  // const onConnect = () => {
-  //   setIsConnect(true);
-  // }
-
-  // useEffect(() => {
-  //   if (post && stompClient) {
-  //     stompClient.send
-  //   }
-  // }, [post])
-
-  // useEffect(() => {
-  //   if (isConnect && stompClient) {
-  //     const subscription = stompClient.subscribe(`/topic/posts/likes/${post.id}`, );
-  //   }
-  // })
-
-  // useEffect(() => {
-  //   connect();
-  // }, []);
-
-  // const recivedLikes = (payload) => {
-  //   console.log("Playload: ", payload.body);
-  // }
+    // Update the state once with all valid media
+    setpostsMedia(validMedia);
+  };
 
   useEffect(() => {
     (async () => {
@@ -168,28 +163,7 @@ function PostPreview({ post }) {
       setIsFollowingUserPost(status.data === "true" ? true : false);
 
       // load the post images or videos
-      post.postMedia.forEach(async (postMedia) => {
-        const response = await postService.getPostMedia(
-          postMedia.id,
-          authToken
-        );
-        if (!response.success) {
-          setError(response.error);
-          return;
-        }
-        setpostsMedia((prevMedia) => {
-          if (prevMedia)
-            setpostsMedia([
-              ...prevMedia,
-              { id: postMedia.id, url: URL.createObjectURL(response.data) },
-            ]);
-          else
-            setpostsMedia([
-              { id: postMedia.id, url: URL.createObjectURL(response.data) },
-            ]);
-        });
-      });
-
+      await loadPostContent();
       // check current post is saved
       const savedRespose = await postService.isSavedPost(post.id, authToken);
       if (!savedRespose.success) {
@@ -207,45 +181,6 @@ function PostPreview({ post }) {
       setIsLikedPost(likeResponse.data);
     })();
   }, [toggleLikeBtn]);
-
-  // useEffect(() => {
-  //   console.log("try to connected")
-  //   const client = new Client({
-  //     brokerURL: "ws://localhost:8080/api/v1/ws",
-  //     connectHeaders: {
-  //       Authorization: `Bearer ${authToken}`,
-  //     },
-  //     reconnectDelay: 5000,
-  //     onConnect: () => {
-  //       console.log("Connected to WebSocket");
-  //       client.subscribe(`/topic/posts/likes/${post.id}`, (message) => {
-  //         const updatedLikeCount = JSON.parse(message.body);
-  //         console.log("Updated likes:", updatedLikeCount);
-  //         setLikeCount(updatedLikeCount);
-  //       });
-  //     },
-  //     onStompError: (error) => {
-  //       console.error("STOMP error:", error);
-  //       setError(`STOMP error: ${error.message || "STOMP protocol error."}`);
-  //     },
-  //     onWebSocketError: (error) => {
-  //       console.error("WebSocket error:", error);
-  //       setError(`WebSocket error: ${error.message || "Unable to connect to WebSocket server."}`);
-  //     },
-  //     onDisconnect: () => {
-  //       console.log("Disconnected from WebSocket");
-  //     },
-  //   });
-
-  //   client.activate();
-  //   setStompClient(client);
-
-  //   return () => {
-  //     if (client) {
-  //       client.deactivate();
-  //     }
-  //   };
-  // }, [authToken, post.id]);
 
   return (
     <div className="post" key={post.id}>
@@ -331,7 +266,7 @@ function PostPreview({ post }) {
           />
         </div>
         <div className="content">
-          {(post.postMedia || []).length > 1 && (
+          {(post.postMedia || []).length > 1 && contentIdx !== 0 && (
             <button className="scroll-btn left" onClick={scrollLeft}>
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
@@ -348,41 +283,51 @@ function PostPreview({ post }) {
                   }
                 />
               ) : postMedia.type.startsWith("video") ? (
-                // <video
-                //   key={postMedia.id}
-                //   muted={true}
-                //   onDoubleClick={(event) => {
-                //     if (isMuted) {
-                //       event.target.muted = false;
-                //     } else {
-                //       event.target.muted = true;
-                //     }
-                //     setIsMuted((muted) => !muted);
-                //   }}
-                //   onClick={(event) => {
-                //     if (event.target.paused) {
-                //       event.target.play();
-                //     } else {
-                //       event.target.pause();
-                //     }
-                //   }}
-                // >
-                //   <source src={postMedia.mediaUrl} type="video/mp4" />
-                // </video>
-                <HlsVideoPlayer
-                  isMuted={isMuted}
-                  setIsMuted={setIsMuted}
-                  videoUrl={
-                    (postsMedia || []).find(
-                      (media) => media.id === postMedia.id
-                    )?.url
-                  }
-                />
+                <div className="video">
+                  <video
+                    ref={videoRef}
+                    muted={isMuted}
+                    src={
+                      (postsMedia || []).find(
+                        (media) => media.id === postMedia.id
+                      )?.url
+                    }
+                    onClick={(event) => {
+                      const video = event.target;
+                      if (video.paused) {
+                        setIsPaused(false);
+                        video.play();
+                      } else {
+                        setIsPaused(true);
+                        video.pause();
+                      }
+                    }}
+                  />
+                  <div className="video-controls">
+                    <button
+                      className="control-icon"
+                      onClick={() => setIsMuted((prev) => !prev)}
+                    >
+                      {isMuted ? (
+                        <FontAwesomeIcon icon={faVolumeMute} />
+                      ) : (
+                        <FontAwesomeIcon icon={faVolumeUp} />
+                      )}
+                    </button>
+                    <button className="control-icon">
+                      {isPaused ? (
+                        <FontAwesomeIcon icon={faPlayCircle} />
+                      ) : (
+                        <FontAwesomeIcon icon={faPauseCircle} />
+                      )}
+                    </button>
+                  </div>
+                </div>
               ) : null
             )}
           </div>
-
-          {(post.postMedia || []).length > 1 && (
+          <GenerateDots length={post.postMedia.length} idx={contentIdx} />
+          {(post.postMedia || []).length > 1 && contentIdx !== (post.postMedia.length - 1) && (
             <button className="scroll-btn right" onClick={scrollRight}>
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -430,10 +375,48 @@ function PostPreview({ post }) {
               Post
             </button>
           )}
+          <FontAwesomeIcon
+            icon={faFaceSmile}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpenEmojiPicker(!isOpenEmojiPicker);
+            }}
+          />
+          <div
+            className={`emoji-picker ${isOpenEmojiPicker ? "open" : ""}`}
+            ref={emojiRef}
+          >
+            <EmojiPicker
+              onEmojiClick={(emojiData) => {
+                setCommentMsg((prev) => prev + emojiData.emoji);
+              }}
+              previewConfig={{ showPreview: false }}
+              skinTonesDisabled
+              theme="light"
+              searchDisabled
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+const GenerateDots = ({ length, idx }) => {
+  if (length === 1) return null;
+  return (
+    <div className="post-state">
+      {Array.from({ length }, (_, index) => (
+        <div key={index} className="point">
+          {index === idx ? (
+            <FontAwesomeIcon icon={faCircle} />
+          ) : (
+            <FontAwesomeIcon icon={faCircleEmpty} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default PostPreview;

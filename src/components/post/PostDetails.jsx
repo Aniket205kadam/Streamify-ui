@@ -8,6 +8,10 @@ import {
   faEllipsis,
   faPaperPlane,
   faCircle,
+  faXmark,
+  faXmarkCircle,
+  faPauseCircle,
+  faPlayCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { faCircle as faCircleEmpty } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,6 +27,8 @@ import Comment from "./Comment";
 import "./PostDetails.scss";
 import { useNavigate } from "react-router-dom";
 import PostCard from "../post/PostCard";
+import PostInfo from "../popups/PostInfo";
+import AboutAccount from "../popups/AboutAccount";
 
 function PostDetails() {
   const { postId } = useParams();
@@ -32,6 +38,7 @@ function PostDetails() {
   const [postComments, setPostComments] = useState([]);
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [postOwnerProfile, setPostOwnerProfile] = useState("");
   const [loading, setLoading] = useState(true);
   const [contentIdx, setContentIdx] = useState(0);
@@ -39,6 +46,9 @@ function PostDetails() {
   const [commentCount, setCommentCount] = useState(0);
   const [postsMedia, setPostsMedia] = useState([]);
   const [isSaved, setIsSaved] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [showAboutAccount, setShowAboutAccount] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch post details, comments, and like status
   useEffect(() => {
@@ -142,15 +152,17 @@ function PostDetails() {
   }, [post, connectedUser.authToken]);
 
   const toggleLeft = () => {
-    if (contentIdx != 0) {
-      setContentIdx((prevIdx) => prevIdx - 1);
-    }
+    // if (contentIdx != 0) {
+    //   setContentIdx((prevIdx) => prevIdx - 1);
+    // }
+    setContentIdx((prev) => Math.max(0, prev - 1));
   };
 
   const toggleRight = () => {
-    if (contentIdx != post.postMedia.length - 1) {
-      setContentIdx((prevIdx) => prevIdx + 1);
-    }
+    // if (contentIdx != post.postMedia.length - 1) {
+    //   setContentIdx((prevIdx) => prevIdx + 1);
+    // }
+    setContentIdx((prev) => Math.min(post.postMedia.length - 1, prev + 1));
   };
 
   const sendComment = async () => {
@@ -225,7 +237,27 @@ function PostDetails() {
 
   return (
     <div className="post-page">
+      {showMoreOptions && (
+        <PostInfo
+          inDetails={true}
+          isFollowingPost={true}
+          isFavorites={false}
+          postId={postId}
+          closeOptions={setShowMoreOptions}
+          openAboutAccount={setShowAboutAccount}
+        />
+      )}
+      {showAboutAccount && (
+        <AboutAccount
+          username={post.user.username}
+          profileUrl={postOwnerProfile}
+          close={setShowAboutAccount}
+        />
+      )}
       <div className="post-details-container">
+        <div className="close-page" onClick={() => navigate(-1)}>
+          <FontAwesomeIcon icon={faXmarkCircle} />
+        </div>
         <div className="left">
           {contentIdx != 0 && post.postMedia.length > 1 && (
             <div className="left-chevron" onClick={toggleLeft}>
@@ -243,7 +275,24 @@ function PostDetails() {
                 alt={post.user.username}
               />
             ) : (
-              <video src={postsMedia[contentIdx]} autoPlay controls />
+              <div className="video">
+                <video
+                  src={postsMedia[contentIdx]}
+                  key={postsMedia[contentIdx]}
+                  onClick={(event) => {
+                    if (event.target.paused) {
+                      setIsPaused(false);
+                      event.target.play();
+                    } else {
+                      setIsPaused(true);
+                      event.target.pause();
+                    }
+                  }}
+                />
+                <div className="action">
+                  {isPaused && <FontAwesomeIcon icon={faPauseCircle} />}
+                </div>
+              </div>
             )}
           </div>
           {contentIdx != (post.postMedia || []).length - 1 &&
@@ -278,7 +327,10 @@ function PostDetails() {
               <div className="name">{post.user.username}</div>
               <div className="location">{post.location}</div>
             </div>
-            <div className="more-options">
+            <div
+              className="more-options"
+              onClick={() => setShowMoreOptions(true)}
+            >
               <FontAwesomeIcon icon={faEllipsis} />
             </div>
           </div>
@@ -317,10 +369,7 @@ function PostDetails() {
               <FontAwesomeIcon icon={faPaperPlane} className="icon" />
             </div>
             <div className="save">
-              <Save
-                isSaved={isSaved}
-                onClick={saveBtnHandler}
-              />
+              <Save isSaved={isSaved} onClick={saveBtnHandler} />
             </div>
           </div>
           <div className="info">
@@ -439,7 +488,10 @@ const SimilarPost = ({ post }) => {
             ) : (
               <div className="content">
                 {(posts || []).map((post) => (
-                  <div className="post-card" onClick={() => navigate(`/post/${post.id}`)}>
+                  <div
+                    className="post-card"
+                    onClick={() => navigate(`/post/${post.id}`)}
+                  >
                     <PostCard post={post} key={post.id} />
                   </div>
                 ))}

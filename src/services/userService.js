@@ -442,6 +442,45 @@ class userService {
       };
     }
   }
+
+  async getInfoAboutAccount(username, token, timeout = 10000) {
+    if (username === "" || username === null)
+      throw new Error("username is required!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/${username}/about-account`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
 }
 
 export default new userService();

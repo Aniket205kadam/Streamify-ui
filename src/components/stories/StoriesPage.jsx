@@ -7,155 +7,144 @@ import {
   faChevronRight,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import { useParams, useNavigate } from "react-router-dom";
+import storyService from "../../services/storyService";
+import useConnectedUser from "../../hooks/useConnectedUser";
+import { toast } from "react-toastify";
+import userService from "../../services/userService";
 
 function StoriesPage() {
-  const feakStories = [
-    [
-      {
-        id: "1",
-        url: "https://videos.pexels.com/video-files/5834605/5834605-sd_360_640_25fps.mp4",
-        type: "video/",
-        user: {
-          id: "101",
-          username: "alice_wonder",
-          profileUrl: "https://randomuser.me/api/portraits/women/1.jpg",
-        },
-        createdAt: "2025-02-19T10:00:00Z",
-      },
-      {
-        id: "2",
-        url: "https://videos.pexels.com/video-files/7010708/7010708-sd_360_640_30fps.mp4",
-        type: "video/",
-        user: {
-          id: "101",
-          username: "alice_wonder",
-          profileUrl: "https://randomuser.me/api/portraits/women/1.jpg",
-        },
-        createdAt: "2025-02-20T11:00:00Z",
-      },
-    ],
-    [
-      {
-        id: "3",
-        url: "https://images.pexels.com/photos/30818958/pexels-photo-30818958/free-photo-of-close-up-portrait-of-a-tabby-cat-outdoors.jpeg?auto=compress&cs=tinysrgb&w=600",
-        type: "image/",
-        user: {
-          id: "102",
-          username: "bob_marley",
-          profileUrl: "https://randomuser.me/api/portraits/men/2.jpg",
-        },
-        createdAt: "2025-02-19T10:00:00Z",
-      },
-      {
-        id: "4",
-        url: "https://videos.pexels.com/video-files/5834605/5834605-sd_360_640_25fps.mp4",
-        type: "video/",
-        user: {
-          id: "102",
-          username: "bob_marley",
-          profileUrl: "https://randomuser.me/api/portraits/men/2.jpg",
-        },
-        createdAt: "2025-02-20T11:00:00Z",
-      },
-    ],
-    [
-      {
-        id: "5",
-        url: "https://images.pexels.com/photos/30818958/pexels-photo-30818958/free-photo-of-close-up-portrait-of-a-tabby-cat-outdoors.jpeg?auto=compress&cs=tinysrgb&w=600",
-        type: "image/",
-        user: {
-          id: "103",
-          username: "charlie_chaplin",
-          profileUrl: "https://randomuser.me/api/portraits/men/3.jpg",
-        },
-        createdAt: "2025-02-19T10:00:00Z",
-      },
-    ],
-    [
-      {
-        id: "6",
-        url: "https://videos.pexels.com/video-files/7010708/7010708-sd_360_640_30fps.mp4",
-        type: "video/",
-        user: {
-          id: "104",
-          username: "diana_prince",
-          profileUrl: "https://randomuser.me/api/portraits/women/4.jpg",
-        },
-        createdAt: "2025-02-19T10:00:00Z",
-      },
-      {
-        id: "7",
-        url: "https://images.pexels.com/photos/30818958/pexels-photo-30818958/free-photo-of-close-up-portrait-of-a-tabby-cat-outdoors.jpeg?auto=compress&cs=tinysrgb&w=600",
-        type: "image/",
-        user: {
-          id: "104",
-          username: "diana_prince",
-          profileUrl: "https://randomuser.me/api/portraits/women/4.jpg",
-        },
-        createdAt: "2025-02-20T11:00:00Z",
-      },
-    ],
-  ];
-  console.log(feakStories);
-  const [stories, setStories] = useState(feakStories);
-  const [currStoryIdx, setCurrStoryIdx] = useState(0);
-//   const [nextStoryIdx, setNextStoryIdx] = useState(1);
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const [currentUserIdx, setCurrentUserIdx] = useState(0);
+  const connectedUser = useConnectedUser();
+  const [nextStoriesUsername, setNextStoriesUsername] = useState([username]);
   const [isAudio, setIsAudio] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [prevStory, setPrevStory] = useState("");
+  const [nextStory, setNextStory] = useState("");
+
   useEffect(() => {
-    setStories(feakStories);
-    setCurrStoryIdx(0);
-    // setNextStoryIdx(1);
-    setLoading(false);
-  }, []);
+    (async () => {
+      try {
+        const storiesResponse = await storyService.getFollowingsStories(
+          connectedUser.authToken
+        );
+        if (!storiesResponse.success) {
+          toast.error(storiesResponse.error);
+          return;
+        }
+        const usernames = storiesResponse.data
+          .filter((user) => !user.allStoriesSeen)
+          .map((user) => user.username);
+        setNextStoriesUsername((prev) => [...new Set([...prev, ...usernames])]);
+      } catch (error) {
+        toast.error("Failed to load stories.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [username, connectedUser.authToken]);
 
   const handleClose = () => {
-    // close page
-  };
-  const handlePrevStory = () => {
-    // if (currStoryIdx != 0)
-    setCurrStoryIdx((prevStoryIdx) => prevStoryIdx - 1);
-  };
-  const handleNextStory = () => {
-    // if (currStoryIdx != (stories.length-1))
-    setCurrStoryIdx((prevStoryIdx) => prevStoryIdx + 1);
+    navigate('/');
   };
 
+  // generate profile (prev, next)
+  const generateSecStory = async (username, prev, next) => {
+    const userResposne = await userService.getUserProfileByUsername(
+      username,
+      connectedUser.authToken
+    );
+    if (prev && !next) {
+      if (!userResposne.success) {
+        toast.error("Failed to load previous story!");
+        return;
+      }
+      setPrevStory(URL.createObjectURL(userResposne.data));
+    } else if (!prev && next) {
+      if (!userResposne.success) {
+        toast.error("Failed to load previous story!");
+        return;
+      }
+      setNextStory(URL.createObjectURL(userResposne.data));
+    } else {
+      toast.error("Somthing is wrong!");
+    }
+  };
+
+  const handlePrevStory = () => {
+    let temp = currentUserIdx;
+    navigate(`/stories/${nextStoriesUsername[temp - 1]}`);
+    if (temp - 1 >= 0) {
+      generateSecStory(nextStoriesUsername[temp - 1], true, false);
+    }
+    setCurrentUserIdx((prev) => prev - 1);
+  };
+
+  const handleNextStory = () => {
+    let temp = currentUserIdx;
+    navigate(`/stories/${nextStoriesUsername[temp + 1]}`);
+    if (temp + 1 > nextStoriesUsername.length) {
+      generateSecStory(nextStoriesUsername[temp + 1], false, true);
+    }
+    setCurrentUserIdx((prev) => prev + 1);
+  };
 
   if (loading) {
     return <h1>Loading...</h1>;
-  } else {
-    return (
-      <div className="stories-container">
-        <div className="close-page">
-          <button onClick={handleClose}>
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
-        </div>
+  }
 
-        {currStoryIdx > 0 && (
-          <div className="left" onClick={handlePrevStory}>
+  return (
+    <div className="stories-container">
+      <div className="close-page">
+        <button onClick={handleClose}>
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+      </div>
+
+      {currentUserIdx > 0 && (
+        <>
+          <div className="nav-button left" onClick={handlePrevStory}>
             <FontAwesomeIcon icon={faChevronLeft} />
           </div>
-        )}
+          <div className="previous-story">
+            <img
+              src={
+                prevStory || "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+              }
+            />
+            <span>{nextStoriesUsername[currentUserIdx - 1]}</span>
+          </div>
+        </>
+      )}
 
-        <div className="display-story">
-          <Story
-            userStories={stories[currStoryIdx]}
-            isAudio={isAudio}
-            setIsAudio={setIsAudio}
-          />
-        </div>
+      <div className="display-story">
+        <Story
+          username={nextStoriesUsername[currentUserIdx]}
+          isAudio={isAudio}
+          setIsAudio={setIsAudio}
+        />
+      </div>
 
-        {currStoryIdx !== stories?.length - 1 && (
-          <div className="right" onClick={handleNextStory}>
+      {currentUserIdx < nextStoriesUsername.length - 1 && (
+        <>
+          <div className="nav-button right" onClick={handleNextStory}>
             <FontAwesomeIcon icon={faChevronRight} />
           </div>
-        )}
-      </div>
-    );
-  }
+          <div className="next-story">
+            <img
+              src={
+                nextStory || "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+              }
+            />
+            <span>{nextStoriesUsername[currentUserIdx + 1]}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export default StoriesPage;

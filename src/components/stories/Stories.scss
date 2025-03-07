@@ -1,168 +1,182 @@
-@import "../../style.scss";
+// Stories.scss
+// .stories-container {
+  // position: relative;
+  // background: #ffffff;
+  // border: 1px solid #dbdbdb;
+  // border-radius: 3px;
+  // padding: 16px 0;
+  // margin: 0 auto 24px;
+  // max-width: 600px;
 
-.stories-container {
+  .scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #dbdbdb;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
-    position: relative;
-    width: 100vw;
-    max-width: 600px;
-    margin: auto;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &.left {
+      left: -40px;
+    }
+
+    &.right {
+      right: -40px;
+    }
+  }
+
+  .stories {
+    display: flex;
+    gap: 16px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 
     &::-webkit-scrollbar {
       display: none;
     }
-    
-}
 
-.stories {
-    @include themify($themes) {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
-    white-space: nowrap;
-    flex: 1;
-    padding: 10px;
+    .user-story, .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 72px;
 
-    .user-has-story {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      padding: 3px;
-      background: linear-gradient(
-          45deg,
-          #f09433,
-          #e6683c,
-          #dc2743,
-          #cc2366,
-          #bc1888
-          );
-      }
-
-    .user-story {
+      .story-circle {
         position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
+        width: 66px;
+        height: 66px;
+        border-radius: 50%;
+        padding: 2px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
 
         img {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            object-fit: cover;
-            object-fit: cover;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid white;
+          background: #f8f8f8;
         }
 
-        span {
-            margin-top: 5px;
-            font-size: 12px;
-            color: themed("textColor");
-            font-weight: 500;
-            white-space: nowrap;
-            text-align: center;
+        &.seen {
+          background: #e0e0e0;
         }
+      }
 
-        .add-story-btn {
-            position: absolute;
-            bottom: 30px;
-            right: 5px;
-            background-color: #5271ff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px;
-        }
-      
-  }
-}
-}
-
-.stories::-webkit-scrollbar {
-  display: none;
-}
-
-.story {
-    @include themify($themes) {
+      .add-story-btn {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        background: #0095f6;
+        border: 2px solid white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
         display: flex;
-        flex-direction: column;
         align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transition: transform 0.3s ease-in-out;
+        transition: all 0.2s ease;
 
-        .profile-border {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            padding: 3px;
-            background: linear-gradient(
-            45deg,
-            #f09433,
-            #e6683c,
-            #dc2743,
-            #cc2366,
-            #bc1888
-            );
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        &:hover {
+          background: #007acc;
+          transform: scale(1.1);
+        }
 
-            img {
-              width: 64px;
-              height: 64px;
-              border-radius: 50%;
-              object-fit: cover;
-              border: 2px solid white;
-            }
+        svg {
+          color: white;
+          font-size: 14px;
+        }
+      }
+
+      span {
+        font-size: 12px;
+        color: #262626;
+        font-weight: 400;
+        max-width: 72px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .has-story .story-circle {
+      background: linear-gradient(
+        45deg,
+        #fdf497 0%,
+        #fdf497 5%,
+        #fd5949 45%,
+        #d6249f 60%,
+        #285AEB 90%
+      );
+    }
+  }
+// }
+
+@media (max-width: 640px) {
+  .stories-container {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    padding: 12px 0;
+
+    .stories {
+      padding: 0 12px;
+      gap: 12px;
+
+      .user-story, .story-item {
+        .story-circle {
+          width: 60px;
+          height: 60px;
         }
 
         span {
-            margin-top: 5px;
-            font-size: 12px;
-            color: themed("textColor");
-            font-weight: 500;
-            white-space: nowrap;
-            text-align: center;
+          font-size: 11px;
         }
+      }
 
-        &.seen .profile-border {
-            background: #bbb;
-        }
+      .add-story-btn {
+        width: 22px;
+        height: 22px;
+        bottom: -3px;
+        right: -3px;
+      }
     }
-}
 
-.scroll-btn {
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
-  border: none;
-  color: white;
-  font-size: 18px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s;
-}
+    .scroll-btn {
+      width: 28px;
+      height: 28px;
 
-.scroll-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
+      &.left {
+        left: -32px;
+      }
 
-.left {
-  left: -30px;
-}
-
-.right {
-  right: -30px;
+      &.right {
+        right: -32px;
+      }
+    }
+  }
 }

@@ -2,8 +2,16 @@ import React, { useRef } from "react";
 import "./PostInfo.scss";
 import useClickOutside from "../../hooks/useClickOutside";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-function PostInfo({ isFollowingPost, isFavorites, closeOptions, postId }) {
+function PostInfo({
+  inDetails,
+  isFollowingPost,
+  isFavorites,
+  closeOptions,
+  postId,
+  openAboutAccount
+}) {
   const optionsRef = useRef(null);
   const navigate = useNavigate();
 
@@ -33,13 +41,26 @@ function PostInfo({ isFollowingPost, isFavorites, closeOptions, postId }) {
             <span>Add to favorites</span>
           </div>
         )}
-        <div className="option" onClick={() => navigate(`/post/${postId}`)}>
-          <span>Go to post</span>
-        </div>
-        <div className="option">
+        {!inDetails && (
+          <div className="option" onClick={() => navigate(`/post/${postId}`)}>
+            <span>Go to post</span>
+          </div>
+        )}
+        <div
+          className="option"
+          onClick={() => {
+            navigator.clipboard
+              .writeText(`http://localhost:5173/post/${postId}`)
+              .then(() => toast.info("Post link copied to clipboard"))
+              .catch(() => toast.warn("Post link is not copied to clipboard"));
+          }}
+        >
           <span>Copy link</span>
         </div>
-        <div className="option">
+        <div className="option" onClick={() => {
+          closeOptions(false);
+          openAboutAccount(true);
+        }}>
           <span>About this account</span>
         </div>
         <div
