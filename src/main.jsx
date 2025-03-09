@@ -20,6 +20,9 @@ import PostDetails from "./components/post/PostDetails.jsx";
 import { Bounce, ToastContainer } from "react-toastify";
 import StoriesPage from "./components/stories/StoriesPage.jsx";
 import DogAnimation from "./components/3D-componets/dogAnimation.jsx";
+import ChatWindow from "./components/chat/ChatWindow.jsx";
+import PreviousChat from "./components/chat/PreviousChat.jsx";
+import ChatPage from "./pages/chat/ChatPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -60,7 +63,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <DogAnimation />
+        element: <ChatPage />
       }
     ],
   },
@@ -103,10 +106,6 @@ const router = createBrowserRouter([
         <OwnStories />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/test",
-    element: <PostDetails />,
   },
 ]);
 
