@@ -3,7 +3,7 @@ $secondary-bg: #f8f9fa;
 $border-color: #dbdbdb;
 $primary-text: #262626;
 $secondary-text: #8e8e8e;
-$accent-blue: #0095f6;
+$accent-blue: #d9ebf7;
 $online-green: #00cc00;
 
 .chat-page {
@@ -186,7 +186,7 @@ $online-green: #00cc00;
     
       .icon {
         font-size: 6rem;
-        color: #007bff;
+        color: #abcff6;
         margin-bottom: 15px;
       }
     
@@ -372,11 +372,11 @@ $online-green: #00cc00;
         
             &.sent {
               background-color: $accent-blue;
-              color: white;
+              color: #000;
               align-self: flex-end;
         
               .timestamp {
-                color: rgba(255, 255, 255, 0.8);
+                color: #000;
               }
 
               &.transparent {

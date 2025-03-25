@@ -1,145 +1,338 @@
-@import "../../style.scss";
-
 .register {
-  @include themify($themes) {
-  height: 100vh;
+  $primary: var(--primary-color, #3d6af2);
+  $secondary: var(--secondary-color, #3d6af2);
+  $background: var(--background-color, #f8fafc);
+  $text: var(--text-color, #2d3748);
+  $error: #ef4444;
+
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: themed("bg");
+  min-height: 100vh;
+  background: $background;
+  position: relative;
+  overflow: hidden;
 
-  .card {
-    display: flex;
-    width: 70%;
-    max-width: 900px;
-    background: themed("bgSoft");
-    box-shadow: 0 4px 8px themed("shadow");
-    border-radius: 12px;
-    overflow: hidden;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      width: 90%;
+  .left {
+    flex: 2;
+    position: relative;
+    
+    .video-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7);
+      z-index: 1;
     }
 
-    .left {
-      flex: 1;
+    .content-overlay {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 3rem;
+      color: white;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      background: themed("bgSoft");
+      right: 20%;
+    }
 
-      .crowed-container {
-        width: 100%;
-        height: 100%;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba($primary, 0.15), rgba($secondary, 0.15));
+      z-index: 1;
+    }
+
+    .welcome-msg {
+      max-width: 600px;
+      margin: 0 auto;
+
+      .logo {
+        max-width: 120px;
+        margin-bottom: 2rem;
+        
+        img {
+          width: 100%;
+          height: auto;
+        }
+      }
+
+      .welcome-text {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.9;
+        display: block;
+      }
+
+      .app-name {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        letter-spacing: -1px;
+      }
+
+      .motivation-line {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .right {
+    flex: 1;
+    min-width: 400px;
+    padding: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+
+    .streamify-logo {
+      font-size: 3rem !important;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(45deg, $primary, $secondary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      letter-spacing: -2px;
+      text-align: center;
+    }
+
+    > p {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    .social-login {
+      margin: 2rem 0;
+
+      &-label {
         display: flex;
         align-items: center;
-        justify-content: center;
+        margin: 1.5rem 0;
+        color: #64748b;
 
-        .spline-container {
-          width: 80%;
-          height: 80%;
+        &::before,
+        &::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: #e2e8f0;
+        }
+
+        .label-text {
+          padding: 0 1rem;
+          font-size: 0.9rem;
+        }
+      }
+
+      .social-btn {
+        button.facebook-btn {
+          width: 100%;
+          padding: 1rem;
+          background: #ffffff;
+          color: #000;
+          border-color: #e5e7e9;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          .content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+          }
+
+          &:hover {
+            background: darken(#ffffff, 5%);
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      // margin-bottom: 2rem;
+
+      .warn {
+        font-size: 12px;
+        color: #64748b;
+      }
+
+      input {
+        padding: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
+          outline: none;
+        }
+
+        &::placeholder {
+          color: #94a3b8;
+        }
+
+        &[style*="background-color: #96fa5c"] {
+          background-color: #e6ffe6 !important;
+          border-color: #96fa5c;
+        }
+
+        &[style*="background-color: #f7777b"] {
+          background-color: #ffe6e6 !important;
+          border-color: #f7777b;
+        }
+      }
+
+      button {
+        padding: 1rem;
+        background: linear-gradient(45deg, $primary, $secondary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        margin-top: 1rem;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-2px);
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+          }
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .login-option {
+      text-align: center;
+      // margin-top: 2rem;
+      font-size: 0.95rem;
+
+      span {
+        color: #64748b;
+        margin-right: 0.5rem;
+      }
+
+      a {
+        color: $primary;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: $secondary;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .left {
+      min-height: 300px;
+      
+      .content-overlay {
+        padding: 2rem;
+        text-align: center;
+        
+        .logo {
+          margin: 0 auto 1.5rem;
+        }
+        
+        .motivation-line {
+          display: none;
         }
       }
     }
 
     .right {
-      flex: 1;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      min-width: auto;
+      padding: 2.5rem 1.5rem;
+      min-height: auto;
+    }
+  }
 
-      .login-option {
-        margin-top: 20px;
-        font-size: 14px;
-        color: themed("textColorSoft");
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-      
-        span {
-          color: themed("textColorSoft");
-        }
-      
-        a {
-          color: #0095f6;
-          font-weight: bold;
-          text-decoration: none;
-          transition: color 0.3s;
-      
-          &:hover {
-            color: #0077cc;
-            text-decoration: underline;
-          }
-        }
-      }      
+  @media (max-width: 480px) {
+    .right {
+      padding: 2rem 1rem;
 
-      p {
-        font-size: 16px;
-        padding: 2px;
-        color: themed("textColorSoft");
-      }
-
-      h1 {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        color: themed("textColor");
+      .streamify-logo {
+        font-size: 2.5rem !important;
+        margin-bottom: 1rem;
       }
 
       form {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        input {
-          width: 100%;
-          padding: 12px;
-          margin: 8px 0;
-          border: 1px solid themed("textColorSoft");
-          color: themed("textColor");
-          border-radius: 8px;
-          font-size: 16px;
-          background: themed("bgSoft");
-
-          &:focus {
-            outline: none;
-            border-color: themed("textColorSoft");
-          }
-        }
-
-        button.disabled {
-          background: #7ac1f0;
-          opacity: 0.6;
-        }
-
-        button.disabled:hover {
-          cursor: not-allowed;
-        }
-
-        button {
-          width: 100%;
-          padding: 12px;
-          margin-top: 12px;
-          background: #0095f6;
-          color: white;
-          font-size: 16px;
-          font-weight: bold;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: 0.3s;
-
-          &:hover {
-            background: #0077cc;
-          }
-        }
+        gap: 1rem;
       }
     }
   }
 }
+
+.register.theme-dark {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+  --primary-color: #818cf8;
+  --secondary-color: #6366f1;
+
+  .right {
+    background: rgba(0, 0, 0, 0.85);
+    
+    input {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: white;
+
+      &:focus {
+        border-color: var(--primary-color);
+      }
+    }
+
+    .login-option span {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+.register.theme-minimal {
+  --primary-color: #3b82f6;
+  --secondary-color: #60a5fa;
+  --background-color: #ffffff;
+
+  .right {
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
 }

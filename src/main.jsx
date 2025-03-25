@@ -23,6 +23,7 @@ import DogAnimation from "./components/3D-componets/dogAnimation.jsx";
 import ChatWindow from "./components/chat/ChatWindow.jsx";
 import PreviousChat from "./components/chat/PreviousChat.jsx";
 import ChatPage from "./pages/chat/ChatPage.jsx";
+import EditPage from "./pages/edit/EditPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <ChatPage />
+        element: <></>
       }
     ],
   },

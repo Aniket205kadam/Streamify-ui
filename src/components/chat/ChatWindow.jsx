@@ -107,6 +107,7 @@ function ChatWindow({ chat }) {
         toast.error("Failed to load the messages");
         return;
       }
+      console.table(messageResponse.data);
       setMessages(messageResponse.data);
     })();
 
@@ -177,7 +178,7 @@ function ChatWindow({ chat }) {
       toast.error(fileResponse.error);
       return;
     }
-    setFile(null)
+    setFile(null);
   };
 
   if (chat === null || chat === "") {
@@ -324,12 +325,5 @@ function ChatWindow({ chat }) {
     </div>
   );
 }
-
-// const SelectedFile = (file) => {
-//   if (!file) return;
-//   return (
-
-//   );
-// };
 
 export default ChatWindow;

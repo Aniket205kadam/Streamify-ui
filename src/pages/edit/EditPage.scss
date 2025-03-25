@@ -1,0 +1,338 @@
+.editProfile {
+    max-width: 935px;
+    margin: 0 auto;
+    padding: 30px 20px 40px;
+    min-height: calc(100vh - 120px);
+  
+    .profileHeader {
+      border-bottom: 1px solid #dbdbdb;
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+  
+      h1 {
+        font-size: 24px;
+        font-weight: 500;
+        margin: 0;
+        color: #262626;
+      }
+    }
+  
+    .profileSection {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      gap: 24px;
+      padding: 10px;
+      border-radius: 20px;
+      place-items: center;
+      background-color: #d3cece;
+  
+      .avatarWrapper {
+        flex-shrink: 0;
+        text-align: center;
+  
+        img {
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          margin-bottom: 12px;
+          object-fit: cover;
+          place-items: center;
+        }
+      }
+
+      .changePhoto {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        background-color: #0095f6;
+        border: none;
+        margin-left: 50%;
+        padding: 10px;
+        border-radius: 10px;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+  
+      .userInfo {
+        h2 {
+          font-size: 20px;
+          margin: 0 0 4px;
+          color: #262626;
+        }
+  
+        p {
+          margin: 0;
+          color: #737373;
+          font-size: 14px;
+        }
+      }
+    }
+  
+    .formSection {
+
+        .genderSelector {
+            position: relative;
+            width: 100%;
+            font-size: 14px;
+            margin-bottom: 24px;
+          
+            .selectedOption {
+              padding: 12px 16px;
+              border: 1px solid #dbdbdb;
+              border-radius: 8px;
+              cursor: pointer;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              background-color: white;
+              transition: border-color 0.2s ease;
+          
+              &:hover {
+                border-color: #a8a8a8;
+              }
+          
+              .arrow {
+                font-size: 12px;
+                transition: transform 0.2s ease;
+                
+                &.open {
+                  transform: rotate(180deg);
+                }
+              }
+            }
+          
+            .genderOptions {
+              position: absolute;
+              width: 100%;
+              border: 1px solid #dbdbdb;
+              border-radius: 8px;
+              background: white;
+              margin-top: 8px;
+              z-index: 10;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          
+              .genderOption {
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+          
+                &:hover {
+                  background-color: #fafafa;
+                }
+          
+                input {
+                  position: absolute;
+                  opacity: 0;
+                  cursor: pointer;
+                  height: 0;
+                  width: 0;
+          
+                  &:checked ~ .checkmark {
+                    background-color: #0095f6;
+                    border-color: #0095f6;
+          
+                    &::after {
+                      display: block;
+                    }
+                  }
+                }
+          
+                .checkmark {
+                  position: relative;
+                  height: 18px;
+                  width: 18px;
+                  border: 2px solid #dbdbdb;
+                  border-radius: 4px;
+                  margin-right: 12px;
+          
+                  &::after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                    left: 5px;
+                    top: 2px;
+                    width: 4px;
+                    height: 8px;
+                    border: solid white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                  }
+                }
+          
+                .labelText {
+                  color: #262626;
+                }
+          
+                &:not(:last-child) {
+                  border-bottom: 1px solid #dbdbdb;
+                }
+              }
+            }
+          }
+
+
+      .formGroup {
+        margin-bottom: 32px;
+  
+        label {
+          display: block;
+          margin-bottom: 12px;
+          font-weight: 700;
+          font-size: 14px;
+          color: #262626;
+        }
+      }
+  
+      .info {
+        color: #737373;
+        font-size: 12px;
+        margin-top: 12px;
+        line-height: 1.4;
+      }
+
+      .websiteMessage {
+        background-color: #fafafa;
+        border: 1px solid #dbdbdb;
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 16px;
+        color: #262626;
+        width: 100%;
+        line-height: 1.5;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      }
+  
+      .bioInput {
+        width: 100%;
+        border: 1px solid #dbdbdb;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+        line-height: 1.5;
+        transition: border-color 0.2s ease;
+  
+        &:focus {
+          outline: none;
+          border-color: #0095f6;
+          box-shadow: 0 0 0 2px rgba(0,149,246,0.1);
+        }
+      }
+  
+      .bioCounter {
+        text-align: right;
+        font-size: 12px;
+        color: #8e8e8e;
+        margin-top: 8px;
+      }
+  
+      .genderOptions {
+        border: 1px solid #dbdbdb;
+        border-radius: 8px;
+        background: white;
+  
+        .genderOption {
+          padding: 16px;
+          border-bottom: 1px solid #dbdbdb;
+          display: flex;
+          align-items: center;
+  
+          &:last-child {
+            border-bottom: none;
+          }
+  
+          label {
+            margin-left: 12px;
+            font-weight: 500;
+            color: #262626;
+          }
+  
+          input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #0095f6;
+          }
+        }
+      }
+  
+      .genderHint {
+        color: #737373;
+        font-size: 12px;
+        margin-top: 12px;
+        line-height: 1.4;
+      }
+  
+      .disclaimer {
+        color: #737373;
+        font-size: 12px;
+        text-align: left;
+        margin-bottom: 24px;
+        line-height: 1.5;
+        padding: 0 8px;
+      }
+  
+      .submitButton {
+        width: 100%;
+        background-color: #0095f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 14px; // Increased padding
+        font-weight: 700; // Bolder
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase; // Better button hierarchy
+  
+        &:hover {
+          background-color: #0077cc;
+          transform: translateY(-1px);
+        }
+  
+        &:active {
+          transform: translateY(0);
+        }
+  
+        &:disabled {
+          background-color: #b2dffc;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
+  // Responsive Fixes
+  @media (max-width: 768px) {
+    .editProfile {
+      padding: 20px 15px 30px;
+  
+      .profileSection {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+  
+        .avatarWrapper {
+          margin-right: 0;
+        }
+      }
+  
+      .formSection {
+        .genderOptions {
+          .genderOption {
+            padding: 12px;
+          }
+        }
+  
+        .submitButton {
+          padding: 12px;
+        }
+      }
+    }
+  }

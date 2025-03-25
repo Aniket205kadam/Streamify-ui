@@ -4,7 +4,7 @@ import RightBar from "./components/rightBar/RightBar";
 import "./style.scss";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.scss";
 import Search from "./pages/search/Search";
 import useClickOutside from "./hooks/useClickOutside";
@@ -12,6 +12,7 @@ import MoreOptions from "./components/popups/MoreOptions";
 import ThemeSwitcher from "./components/popups/ThemeSwitcher";
 import AddPost from "./components/posts/AddPost";
 import AddStory from "./components/story/AddStory";
+import StartAppLoading from "./components/popups/StartAppLoading";
 
 function App() {
   const location = useLocation();
@@ -27,7 +28,7 @@ function App() {
   const themeSwitcherRef = useRef(null);
   const addPostRef = useRef(null);
   const addStoryRef = useRef(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoadingOpen, setIsLoadingOpen] = useState(true);
 
   useClickOutside(searchRef, () => setShowSearchBox(false));
   useClickOutside(moreOptionsRef, () => setShowMoreOption(false));
@@ -45,8 +46,19 @@ function App() {
     setShowMoreOption(true);
   };
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsLoadingOpen(false);
+    }, 5000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    }
+  }, []);
+
   return (
     <div className={`theme-${theme}`}>
+      {isLoadingOpen && <StartAppLoading />}
       <div className={"layout"}>
         <LeftBar
           searchHandler={setShowSearchBox}

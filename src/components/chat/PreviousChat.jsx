@@ -56,6 +56,7 @@ function PreviousChat({ setCurrChat }) {
         if (!userResponse.success) {
           toast.warn("Failed to get " + chat.username + " profile");
         }
+        console.log("chat: ", chat.unreadCount)
         setChatProfiles((prevProfiles) =>
           prevProfiles
             ? [

@@ -1,0 +1,164 @@
+.container-wrapper {
+    $primary-color: #262626;
+    $accent-color: #0095f6;
+    $text-color: #8e8e8e;
+    $background: rgba(10, 10, 10, 0.9);
+  
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $background;
+    z-index: 1000;
+    backdrop-filter: blur(100px);
+  
+    .container {
+      text-align: center;
+      padding: 3rem;
+      position: relative;
+      background-color: #141414f2;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      animation: float 3s ease-in-out infinite;
+      max-width: 90%;
+      width: 400px;
+      filter: drop-shadow(0 0 10em #fff);
+
+  
+      .log {
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+  
+        img {
+          width: 180px;
+          height: 180px;
+          object-fit: contain;
+          filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+          transition: transform 0.3s ease;
+  
+          &:hover {
+            transform: scale(1.05) rotate(5deg);
+          }
+        }
+      }
+  
+      .info {
+        position: relative;
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+  
+        .small {
+          font-size: 0.875rem;
+          color: $text-color;
+          letter-spacing: 0.5px;
+        }
+  
+        .dev {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #000;
+          position: relative;
+          transition: all 0.3s ease;
+  
+          &::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: $accent-color;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+          }
+  
+          &:hover {
+            color: $accent-color;
+            
+            &::before {
+              transform: scaleX(1);
+              transform-origin: left;
+            }
+          }
+        }
+      }
+    }
+  
+    // Floating animation
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  
+    @media (max-width: 768px) {
+      .container {
+        padding: 2rem;
+        
+        .log img {
+          width: 140px;
+          height: 140px;
+        }
+  
+        .info {
+          margin-top: 1.5rem;
+  
+          .small {
+            font-size: 0.75rem;
+          }
+  
+          .dev {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  
+    // Light theme variation
+    &.theme-light {
+      background-color: rgba(255, 255, 255, 0.9);
+  
+      .container {
+        background-color: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+  
+        .info {
+          .small {
+            color: #737373;
+          }
+  
+          .dev {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+  
+    // Colorful theme variation
+    &.theme-colorful {
+      background: linear-gradient(45deg, rgba(255, 107, 107, 0.9), rgba(78, 205, 196, 0.9));
+  
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+  
+        .info .dev {
+          color: white;
+        }
+      }
+    }
+  }
