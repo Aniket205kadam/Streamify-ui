@@ -63,6 +63,14 @@ const router = createBrowserRouter([
         element: <StoriesPage />
       },
       {
+        path: "/direct/inbox",
+        element: <ChatPage />
+      },
+      {
+        path: "/accounts/edit",
+        element: <EditPage />
+      },
+      {
         path: "/test",
         element: <></>
       }

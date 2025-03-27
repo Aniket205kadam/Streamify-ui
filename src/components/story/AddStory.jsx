@@ -105,7 +105,7 @@ function AddStory({ ref }) {
                   />
                 )}
               </div>
-              <div className="caption">
+              {/* <div className="caption">
                 <label htmlFor="caption">Caption: </label>
                 <input
                   type="text"
@@ -113,7 +113,7 @@ function AddStory({ ref }) {
                   value={caption}
                   onChange={(event) => setCaption(event.target.value)}
                 />
-              </div>
+              </div> */}
               <div className="add-btn" onClick={handleStory}>
                 {storyState.isUploading ? (
                   <ButtonLoading />

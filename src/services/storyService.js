@@ -365,6 +365,42 @@ class storyService {
     }
   }
 
+  async getStoryViewers(storyId, page, size, token, timeout = 20000) {
+    if (storyId === null) throw new Error("StoryId is required!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/${storyId}/views?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.json(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
   async getStoryLikedUser(storyId, token, timeout = 20000) {
     if (storyId === null) throw new Error("StoryId is required!");
     const controller = new AbortController();
@@ -386,10 +422,13 @@ class storyService {
         const error = await response.json();
         throw new Error(error.message || `Error ${response.status}`);
       }
+      const json = await response.json();
+      console.log("reponse array: " + Array.isArray(json));
+      console.log("length: " + json.length);
       return {
         success: true,
         status: response.status,
-        data: await response.json(),
+        data: json,
       };
     } catch (error) {
       return {

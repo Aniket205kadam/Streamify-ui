@@ -6,6 +6,7 @@ import userService from "../../services/userService";
 import { toast } from "react-toastify";
 import chatService from "../../services/ChatService";
 import TimeConverter from "../timeConverter/TimeConverter";
+import CreateChat from "./CreateChat";
 
 function PreviousChat({ setCurrChat }) {
   const connectedUser = useConnectedUser();
@@ -13,6 +14,7 @@ function PreviousChat({ setCurrChat }) {
   const [previousChats, setPreviousChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [chatProfiles, setChatProfiles] = useState([]); // [{id: username, data: profileUrl }, {...}, ...]
+  const [isChatCreating, setIsChatCreating] = useState(false);
 
   useEffect(() => {
     // loading connectedUser profile url
@@ -83,12 +85,13 @@ function PreviousChat({ setCurrChat }) {
 
   return (
     <div className="chat-container">
+      {isChatCreating && <CreateChat closeCreateChat={setIsChatCreating} />}
       <div className="chat-header">
         <div className="user-info">
           <img src={connectedUserProfile} alt={connectedUser.username} />
           <h3>{connectedUser.username}</h3>
         </div>
-        <button className="new-chat-btn">
+        <button className="new-chat-btn" onClick={() => setIsChatCreating(true)}>
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
       </div>

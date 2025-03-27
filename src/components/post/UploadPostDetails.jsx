@@ -33,11 +33,23 @@ function generateDots(length, idx) {
   );
 }
 
+const Video = ({ src }) => {
+  return (
+    <video
+      src={src}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.target.paused ? event.target.play() : event.target.pause();
+      }}
+    />
+  );
+};
+
 function UploadPostDetails({ files, handlePostUpload }) {
   const connectedUser = useConnectedUser();
   const [captionCount, setCaptionCount] = useState(0);
   const [mediaIdx, setMediaIdx] = useState(0);
-  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(true);
   const { register, handleSubmit, trigger } = useForm();
 
   return (
@@ -48,11 +60,15 @@ function UploadPostDetails({ files, handlePostUpload }) {
         </button>
         <p>New reel</p>
         <span>
-          <button onClick={async () => {
-            const isValid = await trigger();
-            console.log("here")
-            if (isValid) handleSubmit(handlePostUpload)();
-          }}>Share</button>
+          <button
+            onClick={async () => {
+              const isValid = await trigger();
+              console.log("here");
+              if (isValid) handleSubmit(handlePostUpload)();
+            }}
+          >
+            Share
+          </button>
         </span>
       </div>
       <div className="body">
@@ -61,7 +77,13 @@ function UploadPostDetails({ files, handlePostUpload }) {
           onClick={() => setMediaIdx((prevIdx) => prevIdx - 1)}
         >
           {files.length > 0 && mediaIdx > 0 && (
-            <div className="chevron-left">
+            <div
+              className="chevron-left"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMediaIdx((prev) => prev - 1);
+              }}
+            >
               <FontAwesomeIcon icon={faChevronLeft} />
             </div>
           )}
@@ -71,20 +93,16 @@ function UploadPostDetails({ files, handlePostUpload }) {
             </div>
           ) : (
             <div className="content">
-              <video
-                src={URL.createObjectURL(files[mediaIdx])}
-                onClick={(event) => {
-                  event.target.paused
-                    ? event.target.play()
-                    : event.target.pause();
-                }}
-              />
+              <Video src={URL.createObjectURL(files[mediaIdx])} />
             </div>
           )}
-          {files.length > 0 && files.length != mediaIdx && (
+          {files.length > 0 && mediaIdx < files.length - 1 && (
             <div
               className="chevron-right"
-              onClick={() => setMediaIdx((prevIdx) => prevIdx + 1)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMediaIdx((prev) => prev + 1);
+              }}
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </div>
@@ -110,7 +128,7 @@ function UploadPostDetails({ files, handlePostUpload }) {
                 onChange={(event) => setCaptionCount(event.target.value.length)}
               />
               <FontAwesomeIcon icon={faFaceSmile} />
-              <span>{captionCount}/2,200</span>
+              <CaptionCount captionCount={captionCount} />
             </div>
             <div className="location">
               <input
@@ -121,14 +139,15 @@ function UploadPostDetails({ files, handlePostUpload }) {
               />
               <FontAwesomeIcon icon={faEarthAsia} />
             </div>
-            <div className="collaborators">
+            {/* todo: this commented feature relase later */}
+            {/* <div className="collaborators">
               <input
                 type="text"
                 placeholder="Add collaborators"
                 {...register("collaborators", { required: false })}
               />
               <FontAwesomeIcon icon={faUserPlus} />
-            </div>
+            </div> */}
             {/* <div className="advanced-settings" onClick={() => setIsAdvancedSettingsOpen(prev => !prev)}>
               <div className="heading">
                 <span>Advanced settings</span>
@@ -224,5 +243,9 @@ function UploadPostDetails({ files, handlePostUpload }) {
     </div>
   );
 }
+
+const CaptionCount = ({ captionCount }) => {
+  return <span>{captionCount}/2,200</span>;
+};
 
 export default UploadPostDetails;

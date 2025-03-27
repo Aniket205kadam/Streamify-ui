@@ -111,7 +111,7 @@
               width: 100%;
               border: 1px solid #dbdbdb;
               border-radius: 8px;
-              background: white;
+              background-color: white;
               margin-top: 8px;
               z-index: 10;
               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -285,11 +285,11 @@
         color: white;
         border: none;
         border-radius: 8px;
-        padding: 14px; // Increased padding
-        font-weight: 700; // Bolder
+        padding: 14px;
+        font-weight: 700;
         cursor: pointer;
         transition: all 0.2s ease;
-        text-transform: uppercase; // Better button hierarchy
+        text-transform: uppercase;
   
         &:hover {
           background-color: #0077cc;
@@ -304,6 +304,11 @@
           background-color: #b2dffc;
           cursor: not-allowed;
         }
+      }
+
+      .disable {
+        pointer-events: none;
+        background-color: #b2d1e7;
       }
     }
   }

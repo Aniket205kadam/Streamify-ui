@@ -1,21 +1,58 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/footer/Footer";
 import "./EditPage.scss";
+import useConnectedUser from "../../hooks/useConnectedUser";
+import userService from "../../services/userService";
+import { toast } from "react-toastify";
+import Avtar from "../../components/popups/Avtar";
 
 function EditPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const connectedUser = {
-    username: "aniket205kadam",
-    fullName: "Aniket Kadam",
-    profileUrl:
-      "https://images.pexels.com/photos/3779448/pexels-photo-3779448.jpeg?auto=compress&cs=tinysrgb&w=600",
+  const [website, setWebsite] = useState("");
+  const [bio, setBio] = useState("");
+  const [gender, setGender] = useState("");
+  const [showProfileOptions, setShowProfileOptions] = useState(false);
+  const connectedUser = useConnectedUser();
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [isUpdatable, setIsUpdatable] = useState(false);
+
+  const fetchUserDetails = async () => {
+    const userResponse = await userService.getUserByUsername(
+      connectedUser.username,
+      connectedUser.authToken
+    );
+    if (!userResponse.success) {
+      toast.error("Failed to fetch user details: " + userResponse.error);
+      return;
+    }
+    const userDetails = userResponse.data;
+    setWebsite(userDetails.website || "");
+    setBio(userDetails.bio || "");
+    setGender(userDetails.gender || "");
   };
-  const website = "https://www.aniket205kadam.com";
-  const bio = "I never lose; I either win or learn;";
-  const gender = "male";
+
+  const updateProfileHandler = async () => {
+    const profileResponse = await userService.updateUserProfile(
+      { website, bio, gender },
+      connectedUser.authToken
+    );
+    if (!profileResponse.success) {
+      toast.error("Failed to update details, try again!");
+      return;
+    }
+    toast.success("Successfully update the details!");
+    setIsUpdatable(false);
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+  }, []);
 
   return (
     <div className="editProfile">
+      {showProfileOptions && (
+        <Avtar close={() => setShowProfileOptions(false)} />
+      )}
       <div className="profileHeader">
         <h1>Edit profile</h1>
       </div>
@@ -31,13 +68,27 @@ function EditPage() {
           <h2>{connectedUser.username}</h2>
           <p>{connectedUser.fullName}</p>
         </div>
-        <button className="changePhoto">Change photo</button>
+        <button
+          className="changePhoto"
+          onClick={() => setShowProfileOptions(true)}
+        >
+          Change photo
+        </button>
       </div>
 
       <div className="formSection">
         <div className="formGroup">
           <label>Website</label>
-          <input type="text" value={website} className="websiteMessage" />
+          <input
+            type="text"
+            value={website}
+            className="websiteMessage"
+            placeholder="website"
+            onChange={(e) => {
+              setWebsite(e.target.value.trim());
+              setIsUpdatable(true);
+            }}
+          />
           <div className="info">
             Editing your links is only available on mobile. Visit the Instagram
             app and edit your profile to change the websites in your bio.
@@ -46,7 +97,16 @@ function EditPage() {
 
         <div className="formGroup">
           <label>Bio</label>
-          <textarea className="bioInput" value={bio} maxLength={150} />
+          <textarea
+            className="bioInput"
+            value={bio}
+            maxLength={150}
+            placeholder="bio"
+            onChange={(e) => {
+              setBio(e.target.value);
+              setIsUpdatable(true);
+            }}
+          />
           <div className="bioCounter">{bio.length}/150</div>
         </div>
 
@@ -64,8 +124,11 @@ function EditPage() {
                   <span className="labelText">Male</span>
                   <input
                     type="checkbox"
-                    checked={gender === "male"}
-                    onChange={() => handleGenderChange("male")}
+                    checked={gender === "Male"}
+                    onChange={() => {
+                      setGender("Male");
+                      setIsUpdatable(true);
+                    }}
                   />
                   <span className="checkmark"></span>
                 </label>
@@ -74,8 +137,11 @@ function EditPage() {
                   <span className="labelText">Female</span>
                   <input
                     type="checkbox"
-                    checked={gender === "female"}
-                    onChange={() => handleGenderChange("female")}
+                    checked={gender === "Female"}
+                    onChange={() => {
+                      setGender("Female");
+                      setIsUpdatable(true);
+                    }}
                   />
                   <span className="checkmark"></span>
                 </label>
@@ -84,8 +150,11 @@ function EditPage() {
                   <span className="labelText">Prefer not to say</span>
                   <input
                     type="checkbox"
-                    checked={gender === "preferNot"}
-                    onChange={() => handleGenderChange("preferNot")}
+                    checked={gender === "Prefer not to say"}
+                    onChange={() => {
+                      setGender("Prefer not to say");
+                      setIsUpdatable(true);
+                    }}
                   />
                   <span className="checkmark"></span>
                 </label>
@@ -116,7 +185,12 @@ function EditPage() {
           everyone.
         </p>
 
-        <button className="submitButton">Submit</button>
+        <button
+          className={`submitButton ${isUpdatable ? "" : "disable"}`}
+          onClick={updateProfileHandler}
+        >
+          Submit
+        </button>
       </div>
 
       <Footer />

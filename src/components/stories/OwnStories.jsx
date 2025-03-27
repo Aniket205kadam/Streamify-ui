@@ -17,6 +17,7 @@ function OwnStories() {
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [showViewers, setShowViewers] = useState(false);
   const [showLikes, setShowLikes] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,18 +41,24 @@ function OwnStories() {
     const initializeStoryData = async (stories) => {
       const data = {};
       for (const story of stories) {
-        const [replies, likes] = await Promise.all([
+        const [replies, likes, views] = await Promise.all([
           storyService.getStoryReplies(story.id, 0, 5, connectedUser.authToken),
           storyService.getStoryLikedUser(story.id, connectedUser.authToken),
+          storyService.getStoryViewers(
+            story.id,
+            0,
+            10,
+            connectedUser.authToken
+          ),
         ]);
 
         data[story.id] = {
           replies: replies.success ? replies.data.content : [],
           likes: likes.success ? likes.data : [],
+          views: views.success ? views.data.content : [],
         };
       }
       setStoryData(data);
-      console.log("here: ",data);
     };
 
     fetchStories();
@@ -68,7 +75,11 @@ function OwnStories() {
     return <div className="no-stories">No stories available</div>;
 
   const currentStory = stories[currentStoryIndex];
-  const { replies = [], likes = [] } = storyData[currentStory?.id] || {};
+  const {
+    replies = [],
+    likes = [],
+    views = [],
+  } = storyData[currentStory?.id] || {};
 
   return (
     <div className="own-stories-container">
@@ -93,16 +104,20 @@ function OwnStories() {
           <div className="interactions">
             <div
               className="interaction-box viewers"
-              onClick={() => setShowViewers(!showViewers)}
+              onClick={() => {
+                setShowLikes(false);
+                setShowReplies(false);
+                setShowViewers(true);
+              }}
             >
-              <span>{currentStory.viewers?.length || 0} views</span>
-              {showViewers && (
+              <span>{views.length || 0} views</span>
+              {showViewers && views.length > 0 && (
                 <div className="users-list">
-                  {currentStory.viewers?.map((viewer) => (
+                  {views?.map((viewer) => (
                     <UserItem
                       key={viewer.id}
-                      user={viewer.user}
-                      timestamp={viewer.createdAt}
+                      user={viewer.viewer}
+                      timestamp={viewer.viewedAt}
                     />
                   ))}
                 </div>
@@ -111,33 +126,44 @@ function OwnStories() {
 
             <div
               className="interaction-box likes"
-              onClick={() => setShowLikes(!showLikes)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowReplies(false);
+                setShowViewers(false);
+                setShowLikes(true);
+              }}
             >
               <span>{likes.length} likes</span>
-              {showLikes && (
+              {showLikes && likes.length > 0 && (
                 <div className="users-list">
                   {likes.map((like) => (
                     <UserItem
                       key={like.id}
-                      user={like.user}
-                      timestamp={like.createdAt}
+                      user={like}
                     />
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="interaction-box replies">
+            <div className="interaction-box replies" onClick={(e) => {
+              e.stopPropagation();
+              setShowLikes(false);
+              setShowViewers(false);
+              setShowReplies(prev => !prev);
+            }}>
               <span>{replies.length} replies</span>
-              <div className="replies-list">
-                {replies.map((reply) => (
-                  <div key={reply.id} className="reply">
-                    <UserItem user={reply.user} />
-                    <p>{reply.content}</p>
-                    <span>{useConvertTime(reply.createdAt)}</span>
-                  </div>
-                ))}
-              </div>
+              {showReplies && replies.length > 0 && (
+                <div className="replies-list">
+                  {replies.map((reply) => (
+                    <div key={reply.id} className="reply">
+                      <UserItem user={reply.user} />
+                      <p>{reply.content}</p>
+                      <span>{useConvertTime(reply.createdAt)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -146,14 +172,18 @@ function OwnStories() {
   );
 }
 
-const UserItem = ({ user, timestamp }) => (
-  <div className="user-item">
-    <img src={user.profileUrl} alt={user.username} />
-    <div className="user-info">
-      <span>{user.username}</span>
-      {timestamp && <span>{useConvertTime(timestamp)}</span>}
+const UserItem = ({ user, timestamp }) => {
+  console.log("Liked users: " + user);
+  if (!user) return;
+  return (
+    <div className="user-item">
+      <img src={user.avtar} />
+      <div className="user-info">
+        <span>{user.username}</span>
+        {timestamp && <span>{useConvertTime(timestamp)}</span>}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default OwnStories;

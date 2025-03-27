@@ -3,43 +3,56 @@ class chatService {
   messageBaseUrl = "http://localhost:8080/api/v1/messages";
 
   async createChat(senderId, receiverId, token, timeout = 20000) {
-    if (senderId === null || receiverId === null)
-      throw new Error("Sender and Receiver Id is required!");
+    if (!senderId || !receiverId) {
+      throw new Error("Both senderId and receiverId are required!");
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const formData = new FormData();
-      formData.append("sender_id", senderId);
-      formData.append("receiver_id", receiverId);
+      // Encode parameters for URL safety
+      const url = new URL(this.chatBaseUrl);
+      url.searchParams.append('sender_id', senderId);
+      url.searchParams.append('receiver_id', receiverId);
 
-      const response = await fetch(`${this.chatBaseUrl}`, {
+      const response = await fetch(url.toString(), {
         method: "POST",
         headers: {
-          Authentication: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
-        body: formData,
         signal: controller.signal,
       });
+
       clearTimeout(timeoutId);
+      
+      const responseData = await response.json(); // Parse once
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || `Error ${response.status}`);
+        throw new Error(
+          responseData.message || 
+          responseData.error || 
+          `Request failed with status ${response.status}`
+        );
       }
+
       return {
         success: true,
         status: response.status,
-        data: response.json(),
+        data: responseData,
       };
     } catch (error) {
+      clearTimeout(timeoutId); // Clear timeout if error occurs before timeout
       return {
         success: false,
-        status: null,
-        error:
-          error.name === "AbortError" ? "Request timed out" : error.message,
+        status: error.response?.status || null,
+        error: error.name === "AbortError" 
+          ? "Request timed out" 
+          : error.message || "Failed to create chat",
       };
     }
-  }
+}
 
   async getMyChats(token, timeout = 20000) {
     const controller = new AbortController();

@@ -123,7 +123,7 @@ function Story({ isStoryOwner, username, isAudio, setIsAudio }) {
                 toast.error(storyResposne.error);
                 return;
               }
-              // toast.success(`Watch story of ${username} and id: ${id}`);
+              toast.success(`Watch story of ${username} and id: ${id}`);
             };
             watching(stories[storyIdx].id);
           }
@@ -204,7 +204,7 @@ function Story({ isStoryOwner, username, isAudio, setIsAudio }) {
     <div className="story-container">
       {showOptions && (
         <StoryInfo
-          isStoryOwner={false}
+          isStoryOwner={isStoryOwner}
           closeOptions={setShowOptions}
           showAboutAccount={setShowAboutAccount}
         />

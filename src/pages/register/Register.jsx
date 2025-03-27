@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Register.scss";
 import { Link, useNavigate } from "react-router-dom";
-import Crowed from "../../components/3D-componets/crowed";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import authenticationService from "../../services/authenticationService";
@@ -22,22 +21,20 @@ function Register() {
   const [isUsernameNotExist, setIsUsernameNotExist] = useState(true);
   const [isIdentifierNotExist, setIsIdentifierNotExist] = useState(true);
   const [isValidData, setIsValidData] = useState(false);
-  const [error, setError] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isUsernameNotExist && isIdentifierNotExist) setIsValidData(true);
   }, [isUsernameNotExist, isIdentifierNotExist]);
 
+
   useEffect(() => {
     if (username.trim().length === 0) return;
     (async function isUsernameExists() {
-      setError(false);
       const { success, status, data, error } =
         await authenticationService.isExistUsername(username);
       if (!success) {
-        console.error(`Error: ${error} : ${status}`);
-        setError(error);
+        toast.info(error);
         return;
       }
       setIsUsernameNotExist(data === "true" ? false : true);
@@ -78,7 +75,12 @@ function Register() {
       username: data.username,
     });
     if (!success) {
-      setError(error);
+      console.log(error);
+      if (error.validationErrors) {
+        error.validationErrors.forEach((e) => toast.error(e));
+      } else {
+        toast.error(error);
+      }
       return;
     }
     dispatch(

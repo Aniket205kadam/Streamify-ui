@@ -57,32 +57,31 @@ function Comment({ comment }) {
 
   return (
     <div className="comment" key={comment.id}>
-      <div className="user-profile">
-        <img
-          src={
-            userProfile
-              ? userProfile
-              : "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
-          }
-          alt={comment.user.username}
-        />
-        <span>{comment.user.username}</span>
-      </div>
-      <div className="content">
-        <p>{comment.content}</p>
-      </div>
-      <div className="meta">
-        <div className="time">
-          <span>{createdAt || "Just now"}</span>
-        </div>
-        <div className="likes">
-          {likeCount > 0 && <span>{likeCount} like</span>}
-        </div>
-        <div className="like-button">
-          <Like isLiked={isLiked} onClick={likeBtnHandler} />
-        </div>
+  <div className="user-avatar">
+    <img
+      src={
+        userProfile
+          ? userProfile
+          : "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+      }
+      alt={comment.user.username}
+    />
+  </div>
+  <div className="comment-content">
+    <div className="comment-header">
+      <span className="username">{comment.user.username}</span>
+      <span className="comment-text">{comment.content}</span>
+    </div>
+    <div className="comment-footer">
+      <span className="time">{createdAt || "Just now"}</span>
+      {likeCount > 0 && <span className="likes">{likeCount} like{likeCount !== 1 ? 's' : ''}</span>}
+      <span className="reply">Reply</span>
+      <div className="like-button">
+        <Like isLiked={isLiked} onClick={likeBtnHandler} />
       </div>
     </div>
+  </div>
+</div>
   );
 }
 

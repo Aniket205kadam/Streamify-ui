@@ -9,74 +9,83 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 5;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
 }
 
 .upload-container {
-  height: 600px;
-  width: 1000px;
+  max-width: 900px;
+  width: 90%;
+  min-height: 500px;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 6;
-  background-color: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: white;
+  z-index: 1001;
+  overflow-y: auto;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  .success-animation { margin:150px auto;}
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  }
 
-.checkmark {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: block;
-    stroke-width: 2;
-    stroke: #4bb71b;
-    stroke-miterlimit: 10;
-    box-shadow: inset 0px 0px 0px #4bb71b;
-    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
-    position:relative;
-    top: 5px;
-    right: 5px;
-   margin: 0 auto;
-}
-.checkmark__circle {
-    stroke-dasharray: 166;
-    stroke-dashoffset: 166;
-    stroke-width: 2;
-    stroke-miterlimit: 10;
-    stroke: #4bb71b;
-    fill: #fff;
-    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
- 
-}
+  .success-animation {
+    margin: 2rem auto;
+    text-align: center;
 
-.checkmark__check {
-    transform-origin: 50% 50%;
-    stroke-dasharray: 48;
-    stroke-dashoffset: 48;
-    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-}
+    .checkmark {
+      width: 120px;
+      height: 120px;
+      stroke: #4bb71b;
+      animation: fill 0.4s ease-in-out 0.4s forwards, 
+                scale 0.3s ease-in-out 0.9s both;
 
-@keyframes stroke {
-    100% {
-        stroke-dashoffset: 0;
-    }
-}
+      &__circle {
+        stroke: #4bb71b;
+        fill: rgba(255, 255, 255, 0.9);
+      }
 
-@keyframes scale {
-    0%, 100% {
-        transform: none;
+      &__check {
+        stroke: white;
+      }
     }
 
-    50% {
-        transform: scale3d(1.1, 1.1, 1);
+    + .done-button {
+      margin-top: 2rem;
+      padding: 0.75rem 2rem;
+      background: #4bb71b;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: darken(#4bb71b, 10%);
+        transform: translateY(-2px);
+      }
     }
+  }
 }
 
-@keyframes fill {
-    100% {
-        box-shadow: inset 0px 0px 0px 30px #4bb71b;
-    }
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 
+  0%, 100% { transform: none; } 
+  50% { transform: scale3d(1.1, 1.1, 1); } 
 }
+@keyframes fill { 
+  100% { box-shadow: inset 0 0 0 60px #4bb71b; } 
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -63,16 +63,13 @@ function AddPost({ ref }) {
       setError(new Error("Hmm... That didn’t go as planned! 🤔"));
       return;
     }
-
-    setTimeout(() => {
-      setUploadState({
-        isUploadingContent: false,
-        isUploadingDetails: false,
-        isPostAdded: true,
-        isCompleted: true,
-      });
-      setCurrPostId(response);
-    }, 5000);
+    setUploadState({
+      isUploadingContent: false,
+      isUploadingDetails: false,
+      isPostAdded: true,
+      isCompleted: true,
+    });
+    setCurrPostId(response);
   };
 
   return (
@@ -106,12 +103,6 @@ function AddPost({ ref }) {
             files={files}
             handlePostUpload={uploadPostDetails}
           />
-        )}
-
-        {uploadState.isUploadingDetails && uploadState.isPostAdded && (
-          <div className="pending-animation">
-            <Rocket />
-          </div>
         )}
 
         {uploadState.isCompleted && (

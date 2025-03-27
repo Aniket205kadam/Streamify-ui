@@ -63,7 +63,9 @@ function LeftBar({
         </div>
         <div className="menu">
           <div className="item" onClick={() => navigate("/")}>
-            {currentLocation.pathname === "/" && !isOpenSearchBox && !isOpenCreatePostBox ? (
+            {currentLocation.pathname === "/" &&
+            !isOpenSearchBox &&
+            !isOpenCreatePostBox ? (
               <>
                 <FontAwesomeIcon icon={faHouse} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Home</span>
@@ -118,9 +120,8 @@ function LeftBar({
             )}
           </div>
 
-          <div className="item">
-            {currentLocation.pathname === "/direct/inbox/" &&
-            !isOpenSearchBox ? (
+          <div className="item" onClick={() => navigate("/direct/inbox/")}>
+            {currentLocation.pathname === "/direct/inbox/" ? (
               <>
                 <FontAwesomeIcon icon={faMessage} size="2xl" fade />
                 <span style={{ fontWeight: "bold" }}>Messages</span>
@@ -162,15 +163,25 @@ function LeftBar({
             )}
           </div>
 
-          <div className="user" onClick={() => navigate(`/profile/${connectedUser.username}`)}>
-            {currentLocation.pathname === `/profile/${connectedUser.username}` ? (
+          <div
+            className="user"
+            onClick={() => navigate(`/profile/${connectedUser.username}`)}
+          >
+            {currentLocation.pathname ===
+            `/profile/${connectedUser.username}` ? (
               <>
-                <img src={connectedUser.profileUrl} alt={connectedUser.username + " profile"} />
+                <img
+                  src={connectedUser.profileUrl}
+                  alt={connectedUser.username + " profile"}
+                />
                 <span style={{ fontWeight: "bold" }}>Profile</span>
               </>
             ) : (
               <>
-                <img src={connectedUser.profileUrl} alt={connectedUser.username + " profile"} />
+                <img
+                  src={connectedUser.profileUrl}
+                  alt={connectedUser.username + " profile"}
+                />
                 <span>Profile</span>
               </>
             )}

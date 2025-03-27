@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import "./Profile.scss";
-import { Link, useParams } from "react-router-dom";
+import { data, Link, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserPlus,
@@ -12,6 +12,7 @@ import {
   faGear,
   faCamera,
   faChevronDown,
+  faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import VerifiedBadge from "../../components/icons/VerifiedBadge";
 import ReelIcon from "../../components/icons/ReelIcon";
@@ -23,6 +24,10 @@ import useAuthToken from "../../hooks/useAuthToken";
 import useConnectedUser from "../../hooks/useConnectedUser";
 import storyService from "../../services/storyService";
 import ShowInfoBanner from "../../components/popups/ShowInfoBanner";
+import { useDropzone } from "react-dropzone";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { login } from "../../store/authenticationSlice";
 
 const Profile = () => {
   const { username } = useParams();
@@ -266,12 +271,26 @@ const ProfileHeader = memo(
     onShowFollowing,
     onSuggestedUser,
   }) => {
+    const connectedUser = useConnectedUser();
     const authToken = useAuthToken();
     const [followStatus, setFollowStatus] = useState({
       clickFollowBtn: false,
       status: null,
     });
+    const dispatch = useDispatch();
     const [isFollowing, setIsFollowing] = useState(false);
+    const [avtar, setAvtar] = useState(null);
+    const navigate = useNavigate();
+    const { getRootProps, getInputProps } = useDropzone({
+      accept: {
+        "image/jpeg": [".jpg", ".jpeg"],
+        "image/png": [".png"],
+      },
+
+      onDrop: (files) => {
+        uploadProfile(files[0]);
+      },
+    });
 
     useEffect(() => {
       (async () => {
@@ -279,6 +298,20 @@ const ProfileHeader = memo(
         if (response.success) setIsFollowing(response.data === "true");
       })();
     }, [user, authToken]);
+
+    const uploadProfile = async (file) => {
+      const avtarResponse = await userService.uploadUserProfile(
+        file,
+        authToken
+      );
+      if (!avtarResponse.success) {
+        toast.error(avtarResponse.error);
+        return;
+      }
+      toast.success("Successfully upload the profile!");
+      setAvtar(avtarResponse.data);
+      dispatch(login({ ...connectedUser, profileUrl: avtarResponse.data }));
+    };
 
     const followHandler = async () => {
       const response = await userService.followUser(user.id, authToken);
@@ -298,10 +331,23 @@ const ProfileHeader = memo(
           />
         )}
         <div className="profile-picture">
-          <div className="edit-profile-option">
-            <FontAwesomeIcon icon={faCamera} />
-          </div>
-          <img src={user.profilePictureUrl} alt={`${user.username} profile`} />
+          {isOwnProfile && (
+            <div className="edit-profile-option" {...getRootProps()}>
+              <input {...getInputProps()} />
+              <FontAwesomeIcon icon={faCamera} />
+            </div>
+          )}
+          {isOwnProfile ? (
+            <img
+              src={connectedUser.profileUrl}
+              alt={`${user.username} profile`}
+            />
+          ) : (
+            <img
+              src={user.profilePictureUrl}
+              alt={`${user.username} profile`}
+            />
+          )}
         </div>
         <div className="profile-details">
           <div className="user-meta">
@@ -310,7 +356,12 @@ const ProfileHeader = memo(
             <div className="action-buttons">
               {isOwnProfile ? (
                 <>
-                  <button className="btn">Edit profile</button>
+                  <button
+                    className="btn"
+                    onClick={() => navigate("/accounts/edit/")}
+                  >
+                    Edit profile
+                  </button>
                   <button className="btn">View archive</button>
                 </>
               ) : (
@@ -376,6 +427,14 @@ const ProfileHeader = memo(
           <div className="bio-section">
             <span className="full-name">{user.fullName}</span>
             <p className="bio">{user.bio}</p>
+            {user.website && (
+              <p className="website">
+                <a href={user.website} target="_blank">
+                  <FontAwesomeIcon icon={faLink} />
+                  {user.website}
+                </a>
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -402,7 +461,10 @@ const SuggestedUsers = memo(({ users, scrollLeft, scrollRight, ref }) => (
           <button className="remove-btn">
             <FontAwesomeIcon icon={faXmark} />
           </button>
-          <img src={user.profileUrl} alt={`${user.username} profile`} />
+          <img
+            src={avtar || user.profileUrl}
+            alt={`${user.username} profile`}
+          />
           <span className="username">{user.username}</span>
           <VerifiedBadge />
           <span className="full-name">{user.fullName}</span>
@@ -440,7 +502,7 @@ const ContentDisplay = memo(({ showPosts, showReels, posts, reels }) => (
     {showPosts && (
       <div className="posts-list">
         {posts?.map((post) => (
-          <Link to={`/post/${post.id}`}>
+          <Link to={`/post/${post.id}`} key={post.id}>
             <PostCard post={post} key={post.id} />
           </Link>
         ))}

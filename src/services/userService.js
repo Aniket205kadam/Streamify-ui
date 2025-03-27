@@ -43,15 +43,18 @@ class userService {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}/suggestedUsers?page=${page}&size=${size}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        `${this.baseUrl}/suggestedUsers?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
       clearTimeout(timeoutId);
       if (!response.ok) {
         const error = await response.json();
@@ -146,7 +149,8 @@ class userService {
   }
 
   async getPostByUser(userId, page, size, token, timeout = 10000) {
-    if (userId === "") throw new Error("User ID is required for get user posts!");
+    if (userId === "")
+      throw new Error("User ID is required for get user posts!");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -182,7 +186,8 @@ class userService {
   }
 
   async getReelsByUser(userId, page, size, token, timeout = 10000) {
-    if (userId === "") throw new Error("User ID is required for get user reels!");
+    if (userId === "")
+      throw new Error("User ID is required for get user reels!");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -215,7 +220,7 @@ class userService {
           error.name === "AbortError" ? "Request timed out" : error.message,
       };
     }
-  } 
+  }
 
   async getMyReels(token, page, size, timeout = 1000) {
     if (token === "") throw new Error("Token is required for get user posts!");
@@ -507,11 +512,165 @@ class userService {
         throw new Error(error.message || `Error ${response.status}`);
       }
       const result = await response.text();
-      const isFriend = result === "true"; 
+      const isFriend = result === "true";
       return {
         success: true,
         status: response.status,
         data: isFriend,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getFollowers(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/followings`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.json();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async uploadUserProfile(file, token, timeout = 10000) {
+    if (file === null) {
+      return {
+        success: false,
+        status: null,
+        error: "File is required to upload the avtar",
+      };
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const request = new FormData();
+      request.append("avtar", file);
+      const response = await fetch(`${this.baseUrl}/avtar`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: request,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.text();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async deleteUserProfile(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/remove/avtar`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.text();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async updateUserProfile(request, token, timeout = 10000) {
+    if (request === null) {
+      return {
+        success: false,
+        status: null,
+        error: "Request is needed for update the profile!",
+      };
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(`${this.baseUrl}/account/edit`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
       };
     } catch (error) {
       return {

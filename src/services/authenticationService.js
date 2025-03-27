@@ -19,7 +19,12 @@ class AuthenticationService {
       clearTimeout(timeoutId);
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || `Error ${response.status}`);
+        console.log("error: ", error);
+        return {
+          success: false,
+          status: null,
+          error: error
+        }
       }
       return {
         success: true,

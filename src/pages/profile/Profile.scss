@@ -61,17 +61,53 @@ $hover-overlay: rgba(0, 0, 0, 0.1);
 
     .edit-profile-option {
       position: absolute;
-      bottom: 0;
-      right: 0;
-      background: rgba(0, 0, 0, 0.5);
-      width: 32px;
-      height: 32px;
+      bottom: 30%;
+      right: 25%;
+      background: rgba(0, 0, 0, 0.6);
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
     }
+    
+    .edit-profile-option:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .edit-profile-option::after {
+      // content: "Click Here to Update Avatar";
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      color: white;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      border-radius: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      
+      z-index: 9999; 
+      pointer-events: none;
+    }
+    
+    .edit-profile-option:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-5px);
+    }
+    
+    
   }
 
   .profile-details {
@@ -111,6 +147,11 @@ $hover-overlay: rgba(0, 0, 0, 0.1);
             align-items: center;
             gap: 4px;
           }
+        }
+
+        .btn:hover {
+          background-color: #edebeb;
+          cursor: pointer;
         }
       }
 
@@ -152,8 +193,18 @@ $hover-overlay: rgba(0, 0, 0, 0.1);
       }
 
       .bio {
+        white-space: pre-line;
         margin: 0;
         line-height: 1.5;
+      }
+
+      .website {
+        svg {
+          color: #032d4a;
+        }
+        text-decoration: none;
+        color: #0095f6;
+        cursor: pointer;
       }
     }
   }

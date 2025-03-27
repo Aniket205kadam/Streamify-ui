@@ -19,20 +19,32 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 8px 0;
     width: 100%;
-    max-width: 300px;
+    max-width: 400px;
+
+    .heading {
+      text-align: center;
+      padding: 25px;
+      border-bottom: 1px solid #dbdbdb;
+      font-weight: 200;
+    }
   
     .option {
       padding: 12px 16px;
       cursor: pointer;
       text-align: center;
       transition: background-color 0.2s ease;
+
+      .upload {
+        color: #1678f0;
+        font-weight: 600;
+      }
   
       &:hover {
         background-color: #f5f5f5;
       }
   
       span {
-        font-size: 14px;
+        font-size: 16px;
         color: #262626;
         display: block;
       }
