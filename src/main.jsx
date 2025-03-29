@@ -24,6 +24,7 @@ import ChatWindow from "./components/chat/ChatWindow.jsx";
 import PreviousChat from "./components/chat/PreviousChat.jsx";
 import ChatPage from "./pages/chat/ChatPage.jsx";
 import EditPage from "./pages/edit/EditPage.jsx";
+import GIF from "./components/chat/GIF.jsx";
 
 const router = createBrowserRouter([
   {
@@ -72,7 +73,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <></>
+        element: <GIF />
       }
     ],
   },

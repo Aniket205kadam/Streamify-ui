@@ -1,1 +1,1 @@
-![Screenshot showing how post are displayed in the app.](src\assets\postImg.jpeg)
+![Screenshot showing how post are displayed in the web-app.](src\assets\postImg.jpeg)

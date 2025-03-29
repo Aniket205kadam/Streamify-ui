@@ -4,13 +4,7 @@ import {
   faImage,
   faSmile,
 } from "@fortawesome/free-regular-svg-icons";
-import {
-  faCheck,
-  faCheckDouble,
-  faMessage,
-  faMicrophone,
-  faUpload,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import userService from "../../services/userService";
@@ -22,37 +16,9 @@ import EmojiPicker from "emoji-picker-react";
 import useClickOutside from "../../hooks/useClickOutside";
 import SendBtn from "./SendBtn";
 import Heart from "../3D-componets/Heart";
+import GIF from "./GIF";
 
 function ChatWindow({ chat }) {
-  // // const [messages, setMessages] = useState([
-  // //   {
-  // //     id: 1,
-  // //     content: "Hey there! 👋",
-  // //     createdAt: "10:00 AM",
-  // //     user: { username: "johndoe" },
-  // //   },
-  // //   {
-  // //     id: 2,
-  // //     content: "Hi! How's it going?",
-  // //     createdAt: "10:05 AM",
-  // //     user: { username: "me" },
-  // //   },
-  // //   {
-  // //     id: 3,
-  // //     content: "Great! Want to grab coffee?",
-  // //     createdAt: "10:10 AM",
-  // //     user: { username: "johndoe" },
-  // //   },
-  // // ]);
-
-  // const friend = {
-  //   profileUrl: "https://via.placeholder.com/150",
-  //   username: "johndoe",
-  //   fullName: "John Doe",
-  //   lastActive: "5m",
-  // };
-
-  // const connectedUser = { username: "me" };
   const isFollower = true;
 
   const connectedUser = useConnectedUser();
@@ -65,8 +31,11 @@ function ChatWindow({ chat }) {
   const messageEndRef = useRef(null);
   const inputFileRef = useRef(null);
   const [file, setFile] = useState(null);
+  const [isShowGif, setIsShowGif] = useState(false);
+  const gifRef = useRef(null);
 
   useClickOutside(emojiRef, setIsOpenEmojiPicker);
+  useClickOutside(gifRef, setIsShowGif);
 
   useEffect(() => {
     if (chat === null || chat === "") return;
@@ -140,7 +109,8 @@ function ChatWindow({ chat }) {
       msg,
       connectedUser.username,
       chat.username,
-      connectedUser.authToken
+      connectedUser.authToken,
+      "TEXT"
     );
     if (!chatResponse.success) {
       toast.error("Failed to send message🥵");
@@ -179,6 +149,22 @@ function ChatWindow({ chat }) {
       return;
     }
     setFile(null);
+  };
+
+  const onSelectGif = async (url) => {
+    const chatResponse = await ChatService.sendTextMessage(
+      chat.id,
+      url,
+      connectedUser.username,
+      chat.username,
+      connectedUser.authToken,
+      "GIF"
+    );
+    if (!chatResponse.success) {
+      toast.error("Failed to send message🥵");
+      return;
+    }
+    setIsShowGif(false);
   };
 
   if (chat === null || chat === "") {
@@ -245,12 +231,17 @@ function ChatWindow({ chat }) {
                   src={`data:${message.mediaType};base64,${message.mediaBase64}`}
                   key={message.id}
                 />
-              ) : (
+              ) : message.messageType === "VIDEO" ? (
                 <video
-                  src={`data:${message.mediaType};base64,${message.mediaBase64}`}
+                  src={`data:video/mp4;base64,${message.mediaBase64}`}
                   key={message.id}
+                  controls
                 />
-              )}
+              ) : message.messageType === "GIF" ? (
+                <div className="gif">
+                  <img src={message.content} key={message.id} />
+                </div>
+              ) : null}
               <div className="timestamp">
                 <TimeConverter timestamp={message.createdAt} />
               </div>
@@ -280,26 +271,32 @@ function ChatWindow({ chat }) {
                 <SendBtn />
               </div>
             )}
-            <button
-              className="media-btn"
-              onClick={() => {
-                if (inputFileRef.current) {
-                  inputFileRef.current.click();
-                }
-              }}
-            >
-              <input
-                type="file"
-                ref={inputFileRef}
-                style={{ display: "none" }}
-                onChange={submitFileHandler}
-              />
-              <FontAwesomeIcon icon={faImage} />
-            </button>
             {isMutualFriend && (
               <>
-                <button className="voice-btn">
+                <button
+                  className="media-btn"
+                  onClick={() => {
+                    if (inputFileRef.current) {
+                      inputFileRef.current.click();
+                    }
+                  }}
+                >
+                  <input
+                    type="file"
+                    ref={inputFileRef}
+                    style={{ display: "none" }}
+                    onChange={submitFileHandler}
+                  />
+                  <FontAwesomeIcon icon={faImage} />
+                </button>
+                {/* <button className="voice-btn">
                   <FontAwesomeIcon icon={faMicrophone} />
+                </button> */}
+                <button
+                  className="gif"
+                  onClick={() => setIsShowGif((prev) => !prev)}
+                >
+                  <span>GIF</span>
                 </button>
                 <button className="like-btn" onClick={heartClickedHandler}>
                   <FontAwesomeIcon icon={faHeart} />
@@ -308,7 +305,7 @@ function ChatWindow({ chat }) {
             )}
           </div>
           {isOpenEmojiPicker && (
-            <div className={`emoji-picker`} ref={emojiRef}>
+            <div className="emoji-picker" ref={emojiRef}>
               <EmojiPicker
                 onEmojiClick={(emojiData) => {
                   setMsg((prev) => prev + emojiData.emoji);
@@ -318,6 +315,11 @@ function ChatWindow({ chat }) {
                 theme="light"
                 searchDisabled
               />
+            </div>
+          )}
+          {isShowGif && (
+            <div className="gif-picter" ref={gifRef}>
+              <GIF onSelectGif={onSelectGif} />
             </div>
           )}
         </div>

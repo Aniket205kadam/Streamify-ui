@@ -13,27 +13,27 @@ class chatService {
     try {
       // Encode parameters for URL safety
       const url = new URL(this.chatBaseUrl);
-      url.searchParams.append('sender_id', senderId);
-      url.searchParams.append('receiver_id', receiverId);
+      url.searchParams.append("sender_id", senderId);
+      url.searchParams.append("receiver_id", receiverId);
 
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-      
+
       const responseData = await response.json(); // Parse once
 
       if (!response.ok) {
         throw new Error(
-          responseData.message || 
-          responseData.error || 
-          `Request failed with status ${response.status}`
+          responseData.message ||
+            responseData.error ||
+            `Request failed with status ${response.status}`
         );
       }
 
@@ -47,12 +47,13 @@ class chatService {
       return {
         success: false,
         status: error.response?.status || null,
-        error: error.name === "AbortError" 
-          ? "Request timed out" 
-          : error.message || "Failed to create chat",
+        error:
+          error.name === "AbortError"
+            ? "Request timed out"
+            : error.message || "Failed to create chat",
       };
     }
-}
+  }
 
   async getMyChats(token, timeout = 20000) {
     const controller = new AbortController();
@@ -128,6 +129,7 @@ class chatService {
     senderUsername,
     receiverUsername,
     token,
+    type,
     timeout = 20000
   ) {
     if (chatId === null || chatId === "")
@@ -141,7 +143,9 @@ class chatService {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
-    const type = "TEXT";
+    if (type === null || type === "") {
+      type = "TEXT";
+    }
     const messageRequest = {
       chatId,
       content,
@@ -214,14 +218,13 @@ class chatService {
   }
 
   async uploadFile(chatId, file, token, timeout = 20000) {
-    if (file === null)
-      throw new Error("File is required!");
+    if (file === null) throw new Error("File is required!");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
       const request = new FormData();
-      request.append("chat-id", chatId)
+      request.append("chat-id", chatId);
       request.append("file", file);
       const response = await fetch(`${this.messageBaseUrl}/upload-media`, {
         method: "POST",

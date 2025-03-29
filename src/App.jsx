@@ -58,7 +58,7 @@ function App() {
 
   return (
     <div className={`theme-${theme}`}>
-      {isLoadingOpen && <StartAppLoading />}
+      {/* {isLoadingOpen && <StartAppLoading />} */}
       <div className={"layout"}>
         <LeftBar
           searchHandler={setShowSearchBox}
