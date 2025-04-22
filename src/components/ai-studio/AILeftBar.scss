@@ -1,0 +1,180 @@
+.ai-left-bar {
+    $primary-color: #262626;
+    $accent-color: #0095f6;
+    $background-color: #ffffff;
+    $border-color: #dbdbdb;
+    $text-primary: #262626;
+    $text-secondary: #8e8e8e;
+  
+    width: 280px;
+    height: 100vh;
+    background: $background-color;
+    border-right: 1px solid $border-color;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+  
+    .header {
+      margin-bottom: 30px;
+      
+      .logo {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: $text-primary;
+      }
+  
+      .studio-title {
+        font-size: 18px;
+        color: $text-secondary;
+        font-weight: 400;
+      }
+    }
+  
+    .navigation {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+  
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: none;
+        border: none;
+        color: $text-primary;
+        transition: all 0.2s ease;
+        cursor: pointer;
+  
+        &:hover {
+          background: darken($background-color, 3%);
+        }
+  
+        &.active {
+          background: darken($background-color, 5%);
+          font-weight: 500;
+        }
+  
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+  
+      .create-ai-button {
+        background: $accent-color;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+  
+        &:hover {
+          background: darken($accent-color, 10%);
+        }
+  
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  
+    .chat-history {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 24px;
+  
+      .section-title {
+        font-size: 14px;
+        color: $text-secondary;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+  
+      .chat-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+  
+        &:hover {
+          background: darken($background-color, 3%);
+        }
+  
+        .chat-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+  
+        .chat-info {
+          display: flex;
+          flex-direction: column;
+  
+          .chat-name {
+            font-weight: 500;
+            font-size: 14px;
+          }
+  
+          .chat-username {
+            font-size: 12px;
+            color: $text-secondary;
+          }
+        }
+      }
+    }
+  
+    .user-profile {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: background 0.2s ease;
+  
+      &:hover {
+        background: darken($background-color, 3%);
+      }
+  
+      .profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+  
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+  
+        .username {
+          font-weight: 500;
+          font-size: 14px;
+        }
+  
+        .handle {
+          font-size: 12px;
+          color: $text-secondary;
+        }
+      }
+    }
+  }

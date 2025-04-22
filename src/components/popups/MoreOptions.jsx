@@ -9,10 +9,16 @@ import {
   faMoon,
   faSun,
 } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../store/authenticationSlice";
 
 function More({ switcherHandler, ref }) {
   const theme = useSelector((state) => state.theme.theme);
+  const dispatch = useDispatch();
+
+  const logoutHandler = () => {
+    dispatch(logout());
+  }
 
   return (
     <div class="input" ref={ref}>
@@ -44,7 +50,7 @@ function More({ switcherHandler, ref }) {
       <button class="value">Switch accounts</button>
       <hr />
       <br />
-      <button class="value">Log out</button>
+      <button class="value" onClick={logoutHandler}>Log out</button>
     </div>
   );
 }

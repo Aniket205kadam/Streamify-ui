@@ -1,5 +1,6 @@
 .follow {
     width: 400px;
+    height: 400px;
     max-width: 90%;
     background: #fff;
     border-radius: 12px;
@@ -110,6 +111,21 @@
             color: #666;
           }
         }
+
+        .btn-following {
+          button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border: none;
+  
+            &:hover {
+              opacity: 0.8;
+            }
+          }
+        }
   
         .btn {
           button {
@@ -125,15 +141,15 @@
             }
           }
   
-          button:nth-child(1) {
-            background: #e1306c;
-            color: white;
-          }
+          // button:nth-child(1) {
+          //   background: #e1306c;
+          //   color: white;
+          // }
   
-          button:nth-child(2) {
-            background: #ddd;
-            color: black;
-          }
+          // button:nth-child(2) {
+          //   background: #ddd;
+          //   color: black;
+          // }
         }
       }
     }

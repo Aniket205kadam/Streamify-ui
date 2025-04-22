@@ -13,6 +13,7 @@ import ThemeSwitcher from "./components/popups/ThemeSwitcher";
 import AddPost from "./components/posts/AddPost";
 import AddStory from "./components/story/AddStory";
 import StartAppLoading from "./components/popups/StartAppLoading";
+import Notifications from "./components/notification/Notifications";
 
 function App() {
   const location = useLocation();
@@ -29,12 +30,15 @@ function App() {
   const addPostRef = useRef(null);
   const addStoryRef = useRef(null);
   const [isLoadingOpen, setIsLoadingOpen] = useState(true);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const notificationRef = useRef(null);
 
   useClickOutside(searchRef, () => setShowSearchBox(false));
   useClickOutside(moreOptionsRef, () => setShowMoreOption(false));
   useClickOutside(themeSwitcherRef, () => setShowThemeSwitcher(false));
   useClickOutside(addPostRef, () => setShowCreatePost(false));
   useClickOutside(addStoryRef, () => setShowCreateStory(false));
+  useClickOutside(notificationRef, () => setIsNotificationOpen(false));
 
   const switcherHandler = () => {
     setShowMoreOption(false);
@@ -64,6 +68,8 @@ function App() {
           searchHandler={setShowSearchBox}
           moreHandler={setShowMoreOption}
           isOpenSearchBox={showSearchBox}
+          isNotificationOpen={isNotificationOpen}
+          notificationHandler={setIsNotificationOpen}
           createPostHandler={setShowCreatePost}
           isOpenCreatePostBox={showCreatePost}
         />
@@ -79,6 +85,9 @@ function App() {
         </div>
         {showRightBar && <RightBar isBlur={showSearchBox} />}
       </div>
+      {isNotificationOpen && (
+        <Notifications ref={notificationRef} />
+      )}
 
       {showSearchBox && (
         <Search ref={searchRef} setShowSearchBox={setShowSearchBox} />

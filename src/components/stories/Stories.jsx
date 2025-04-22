@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import useConnectedUser from "../../hooks/useConnectedUser";
 import storyService from "../../services/storyService";
-import userService from "../../services/userService";
+// import userService from "../../services/userService";
 import { toast } from "react-toastify";
 
 function Stories({ showAddStoryBox }) {
@@ -41,8 +41,6 @@ function Stories({ showAddStoryBox }) {
         toast.error(error);
         return;
       }
-      console.log("Userhas story: " + data === "true")
-      console.log("Userhas story: " + typeof data)
       setConnectedUserHasStory(data === "true");
     })();
   }, [connectedUser.authToken]);
@@ -61,28 +59,28 @@ function Stories({ showAddStoryBox }) {
     })();
   }, [connectedUser.authToken]);
 
-  useEffect(() => {
-    if (stories.length > 0) {
-      const fetchProfiles = async () => {
-        const profiles = {};
-        for (const story of stories) {
-          try {
-            const userResponse = await userService.getUserProfileByUsername(
-              story.username,
-              connectedUser.authToken
-            );
-            if (userResponse.success) {
-              profiles[story.username] = URL.createObjectURL(userResponse.data);
-            }
-          } catch (error) {
-            toast.error("Failed to fetch user profile.");
-          }
-        }
-        setUsersProfiles(profiles);
-      };
-      fetchProfiles();
-    }
-  }, [stories, connectedUser.authToken]);
+  // useEffect(() => {
+  //   if (stories.length > 0) {
+  //     const fetchProfiles = async () => {
+  //       const profiles = {};
+  //       for (const story of stories) {
+  //         try {
+  //           const userResponse = await userService.getUserProfileByUsername(
+  //             story.username,
+  //             connectedUser.authToken
+  //           );
+  //           if (userResponse.success) {
+  //             profiles[story.username] = URL.createObjectURL(userResponse.data);
+  //           }
+  //         } catch (error) {
+  //           toast.error("Failed to fetch user profile.");
+  //         }
+  //       }
+  //       setUsersProfiles(profiles);
+  //     };
+  //     fetchProfiles();
+  //   }
+  // }, [stories, connectedUser.authToken]);
 
   return (
     <div>
@@ -113,9 +111,10 @@ function Stories({ showAddStoryBox }) {
             to={`/stories/${story.username}`}
             className="story-item"
           >
-            <div className={`story-circle ${story.allStoriesSeen ? "seen" : ""}`}>
+            <div className={`story-circle ${!story.allStoriesSeen ? "seen" : ""}`}>
               <img
-                src={usersProfiles[story.username] || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"}
+                className="seened"
+                src={story.avtar}
                 alt={story.username}
               />
             </div>

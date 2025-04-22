@@ -129,6 +129,7 @@
       //     }
       //   }
       // }
+
       .suggested-users {
         display: flex;
         flex-direction: column;
@@ -167,6 +168,22 @@
           padding: 8px 12px;
           border-radius: 8px;
           transition: all 0.2s ease;
+
+          .userDetails {
+
+            .follower-count {
+              font-size: 12px;
+            }
+            
+            .profile {
+              text-decoration: none;
+
+              .username {
+                color: #000000;
+                font-size: 16px;
+              }
+            }
+          }
       
           &:hover {
             background-color: #fafafa;
@@ -178,8 +195,8 @@
             gap: 12px;
       
             img {
-              width: 32px;
-              height: 32px;
+              width: 50px;
+              height: 50px;
               border-radius: 50%;
               object-fit: cover;
               border: 1px solid #dbdbdb;
@@ -213,7 +230,7 @@
             border: none;
             background: none;
             color: #0095f6;
-            font-size: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             padding: 0;

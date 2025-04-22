@@ -281,9 +281,10 @@ function PostPreview({ post }) {
                       (media) => media.id === postMedia.id
                     )?.url
                   }
+                  key={post.id}
                 />
               ) : postMedia.type.startsWith("video") ? (
-                <div className="video">
+                <div className="video" key={post.id}>
                   <video
                     ref={videoRef}
                     muted={isMuted}

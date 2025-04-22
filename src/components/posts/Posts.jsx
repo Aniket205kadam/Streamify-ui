@@ -59,7 +59,6 @@ function Posts() {
       });
 
       setIsLastPage(response.data.last);
-      console.log("status: ", response.data.last)
       setLoading(false);
       setStart(false);
     };

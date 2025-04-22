@@ -1,0 +1,297 @@
+// Global variables (moved outside container)
+$primary-color: #262626;
+$accent-color: #0095f6;
+$background-color: #ffffff;
+$border-color: #dbdbdb;
+$text-primary: #262626;
+$text-secondary: #8e8e8e;
+
+.discover-container {
+  max-width: 935px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  background: $background-color;
+
+  .head-section {
+    text-align: center;
+    margin-bottom: 32px;
+
+    .heading {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: $text-primary;
+    }
+
+    .para {
+      color: $text-secondary;
+      font-size: 14px;
+    }
+  }
+
+  .search-section {
+    position: relative;
+    margin-bottom: 32px;
+
+    svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $text-secondary;
+    }
+
+    input {
+      width: 80%;
+      height: 60px;
+      padding: 12px 16px 12px 40px;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      font-size: 16px;
+      background: lighten($background-color, 2%);
+      transition: border-color 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $text-secondary;
+      }
+    }
+  }
+
+  .ai-slider {
+    display: flex;
+    align-items: center;
+    height: 300px;
+    width: 900px;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding: 16px;
+    background: lighten($background-color, 2%);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    .left, .right {
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 50%;
+      transition: background 0.2s ease;
+      flex-shrink: 0;
+
+      &:hover {
+        background: darken($background-color, 5%);
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .ai-profile {
+      flex-grow: 1;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      min-width: 0;
+      
+      .avtar {
+        flex-shrink: 0;
+        img {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+      }
+
+      .ai-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+
+        .bot-name {
+          font-size: 24px;
+          font-weight: 600;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .creator {
+          color: $text-secondary;
+          font-size: 14px;
+        }
+
+        .bio {
+          margin-top: 12px;
+          line-height: 1.4;
+          color: $text-primary;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      }
+    }
+  }
+
+  .popular-ais, .engineer, .gamers, .recently-created {
+    margin-bottom: 40px;
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 24px;
+      color: $text-primary;
+    }
+  }
+
+  .create-ai {
+    text-align: center;
+    padding: 32px;
+    margin: 40px 0;
+    background: lighten($background-color, 2%);
+    border-radius: 12px;
+    border: 1px solid $border-color;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    img {
+      width: 320px;
+      height: 220px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    p {
+      color: $text-secondary;
+      margin-bottom: 24px;
+      line-height: 1.5;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button {
+      background: $accent-color;
+      color: white;
+      padding: 12px 32px;
+      border-radius: 24px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: darken($accent-color, 10%);
+      }
+    }
+  }
+}
+
+// Profile Card Component (fixed class name typo)
+.ai-profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background: lighten($background-color, 2%);
+  border-radius: 12px;
+  border: 1px solid $border-color;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .avtar {
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+  }
+
+  .ai-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .creator, .profession {
+    font-size: 12px;
+    color: $text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .profession {
+    margin-top: 8px;
+    padding: 4px 12px;
+    border-radius: 24px;
+    background: darken($background-color, 2%);
+  }
+}
+
+// Grid Layout for AI Lists
+.popular-ais, .engineer, .gamers, .recently-created {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .discover-container {
+    padding: 16px;
+
+    .ai-slider {
+      flex-direction: column;
+      text-align: center;
+
+      .ai-profile {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .popular-ais, .engineer, .gamers, .recently-created {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+// Added mobile-specific adjustments
+@media (max-width: 480px) {
+  .discover-container {
+    .ai-slider {
+      .ai-profile {
+        .ai-info {
+          .bot-name {
+            font-size: 20px;
+          }
+          .bio {
+            -webkit-line-clamp: 2;
+          }
+        }
+      }
+    }
+    
+    .popular-ais, .engineer, .gamers, .recently-created {
+      grid-template-columns: 1fr;
+    }
+  }
+}

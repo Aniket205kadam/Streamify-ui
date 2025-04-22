@@ -25,6 +25,9 @@ import PreviousChat from "./components/chat/PreviousChat.jsx";
 import ChatPage from "./pages/chat/ChatPage.jsx";
 import EditPage from "./pages/edit/EditPage.jsx";
 import GIF from "./components/chat/GIF.jsx";
+import Notifications from "./components/notification/Notifications.jsx";
+import AIStudio from "./components/ai-studio/AIStudio.jsx";
+import Demo from "./components/leftBar/Demo.jsx";
 
 const router = createBrowserRouter([
   {
@@ -73,7 +76,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/test",
-        element: <GIF />
+        element: <Demo />
       }
     ],
   },
@@ -117,6 +120,14 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/ai-studio",
+    element: (
+      <ProtectedRoute authentication={true}>
+        <AIStudio />
+      </ProtectedRoute>
+    )
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

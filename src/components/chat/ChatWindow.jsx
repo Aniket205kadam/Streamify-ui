@@ -4,7 +4,7 @@ import {
   faImage,
   faSmile,
 } from "@fortawesome/free-regular-svg-icons";
-import { faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faUpload, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import userService from "../../services/userService";
@@ -135,7 +135,7 @@ function ChatWindow({ chat }) {
 
   const submitFileHandler = (event) => {
     setFile(event.target.files[0]);
-    toast.info("File is selected");
+    console.log(event.target.files[0]);
   };
 
   const fileUploadHandler = async () => {
@@ -202,11 +202,20 @@ function ChatWindow({ chat }) {
       <div className="chat-container">
         {file && (
           <div className="selectedFile">
-            <div className="content">
-              <img src={URL.createObjectURL(file)} />
+            <div className="close-btn">
+              <button>
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
             </div>
-            <div className="btn">
-              <button onClick={fileUploadHandler}>
+            <div className="content">
+              {file.type === "image/" ? (
+                <img src={URL.createObjectURL(file)} />
+              ) : (
+                <video src={URL.createObjectURL(file)} controls />
+              )}
+            </div>
+            <div className="btn-group">
+              <button onClick={fileUploadHandler} className="upload-btn">
                 <FontAwesomeIcon icon={faUpload} />
               </button>
             </div>

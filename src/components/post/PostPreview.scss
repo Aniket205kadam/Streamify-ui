@@ -10,6 +10,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     font-family: Arial, sans-serif;
+    margin-bottom: 0;
   
     .container {
       padding: 10px;
@@ -24,7 +25,7 @@
       .userInfo {
         display: flex;
         align-items: center;
-        gap: 10px;
+        // gap: 10px;
   
         .profile-image {
           display: flex;
@@ -83,6 +84,7 @@
         font-size: 12px;
         border-radius: 5px;
         cursor: pointer;
+        margin: 20px;
         transition: 0.3s;
   
         &:hover {

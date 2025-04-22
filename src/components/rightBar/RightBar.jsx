@@ -10,7 +10,6 @@ function RightBar({ isBlur }) {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(true);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
-  const [suggestedFriendsProfile, setSuggestedFriendsProfile] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -36,35 +35,9 @@ function RightBar({ isBlur }) {
         return;
       }
       setSuggestedFriends(friendsResponse.data.content);
-      console.log("HERE:", friendsResponse.data.content);
       setLoading(false);
     })();
   }, []);
-
-  const getProfile = async (username) => {
-    const friendProfileResponse = await userService.getUserProfileByUsername(
-      username,
-      connectedUser.authToken
-    );
-    if (!friendProfileResponse.success) {
-      toast.error(friendProfileResponse.error);
-      return;
-    }
-    return URL.createObjectURL(friendProfileResponse.data);
-  };
-
-  useEffect(() => {
-    (async () => {
-      if (suggestedFriends) {
-        suggestedFriends.forEach(async (friend) => {
-          const profileUrl = await getProfile(friend.username);
-          setSuggestedFriendsProfile((prev) =>
-            prev ? [...prev, profileUrl] : [profileUrl]
-          );
-        });
-      }
-    })();
-  }, [suggestedFriends]);
 
   return (
     <div className={`rightBar ${isBlur ? "blurred" : ""}`}>
@@ -93,19 +66,18 @@ function RightBar({ isBlur }) {
                   {" "}
                   <img
                     src={
-                      suggestedFriendsProfile[idx] ||
-                      "https://media.tenor.com/-n8JvVIqBXkAAAAM/dddd.gif"
+                      friend.avtar
                     }
                     alt={friend.username}
                   />
                 </Link>
-                <div>
+                <div className="userDetails">
                   <Link className="profile" to={`/profile/${friend.username}/`}>
                     <span className="username">{friend.username}</span>
                   </Link>
                   <br />
                   <span className="follower-count">
-                    Followers: {friend.followerCount}
+                    {friend.followerCount} Followers
                   </span>
                 </div>
               </div>

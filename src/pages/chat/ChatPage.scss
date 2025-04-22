@@ -3,7 +3,7 @@ $secondary-bg: #f8f9fa;
 $border-color: #dbdbdb;
 $primary-text: #262626;
 $secondary-text: #8e8e8e;
-$accent-blue: #d9ebf7;
+$accent-blue: #24a2f6;
 $online-green: #00cc00;
 
 .chat-page {
@@ -14,7 +14,7 @@ $online-green: #00cc00;
 
   .left {
     flex: 0 0 30%;
-    max-width: 300px;
+    max-width: 400px;
     border-right: 1px solid $border-color;
     background-color: $primary-bg;
 
@@ -99,7 +99,6 @@ $online-green: #00cc00;
           padding-right: 10px;
           cursor: pointer;
           transition: background-color 0.2s;
-          background-color: #e3f1fa;
 
           &:hover {
             background-color: $secondary-bg;
@@ -293,36 +292,70 @@ $online-green: #00cc00;
 
         .selectedFile {
           position: absolute;
-          display: flex;
           align-items: center;
-          gap: 10px;
-          background: #bbb;
+          gap: 12px;
+          background: #fff;
           border-radius: 12px;
-          padding: 8px 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          padding: 12px 16px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           z-index: 1000;
-          left: 60%;
+          left: 50%;
           top: 30%;
+          transform: translate(-50%, -50%);
+          transition: all 0.3s ease-in-out;
 
+          .close-btn {
+            text-align: right;
+
+            button {
+              border: none;
+              background-color: inherit;
+              font-size: 20px;
+              padding: 3px;
+
+              &:hover {
+                content: "close";
+                background-color: #eb1111;
+                color: #fff;
+              }
+            }
+          }
+        
           .content {
-            img {
-              width: 300px;
-              height: 300px;
+            img, video {
+              width: 320px;
+              height: 320px;
               border-radius: 8px;
               object-fit: cover;
             }
           }
         
-          .btn {
-            cursor: pointer;
-            padding: 2px;
-            
-            svg {
-              color: #0095f6;
-              font-size: 30px;
+          .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        
+            button {
+              cursor: pointer;
+              border: none;
+              background: transparent;
+              padding: 6px;
+              transition: transform 0.2s ease-in-out;
+            }
+        
+            .upload-btn {
+              svg {
+                color: #0095f6;
+                font-size: 32px;
+              }
+            }
+        
+            button:hover {
+              transform: scale(1.1);
             }
           }
         }
+        
         
 
         &::-webkit-scrollbar {

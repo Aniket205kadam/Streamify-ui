@@ -28,6 +28,7 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { login } from "../../store/authenticationSlice";
+import UnFollow from "../../components/popups/UnFollow";
 
 const Profile = () => {
   const { username } = useParams();
@@ -138,6 +139,30 @@ const Profile = () => {
     }
   }, []);
 
+  const loadFollowings = async () => {
+    const response = await userService.getFollowings(username, connectedUser.authToken);
+    if (!response.success) {
+      toast.error("Failed to load the followings");
+      return;
+    }
+    setFollowing(response.data);
+  }
+
+  const loadFollowers = async () => {
+    const response = await userService.getFollowers(username, connectedUser.authToken);
+    if (!response.success) {
+      toast.error("Failed to load the followers");
+      return;
+    }
+    setFollowers(response.data);
+  }
+
+  useEffect(() => {
+    console.log("Here")
+    loadFollowings();
+    loadFollowers();
+  }, []);
+
   if (loading) {
     return <Loading />;
   }
@@ -185,13 +210,14 @@ const Profile = () => {
           reels={reels}
         />
       )}
-
       {showFollowers && (
         <FollowModal
           ref={followersBoxRef}
           heading="Followers"
-          users={followers}
+          follows={followers}
+          user={user}
           onClose={() => setShowFollowers(false)}
+          isCurrentUserProfile={user.username === connectedUser.username}
           onSearch={(query) =>
             setFollowers(
               followers.filter(
@@ -207,8 +233,10 @@ const Profile = () => {
         <FollowModal
           ref={followingBoxRef}
           heading="Following"
-          users={following}
+          user={user}
+          follows={following}
           onClose={() => setShowFollowing(false)}
+          isCurrentUserProfile={user.username === connectedUser.username}
           onSearch={(query) =>
             setFollowing(
               following.filter(
@@ -281,6 +309,7 @@ const ProfileHeader = memo(
     const [isFollowing, setIsFollowing] = useState(false);
     const [avtar, setAvtar] = useState(null);
     const navigate = useNavigate();
+    const [isUnfollowBoxOpen, setIsUnfollowBoxOpen] = useState(false);
     const { getRootProps, getInputProps } = useDropzone({
       accept: {
         "image/jpeg": [".jpg", ".jpeg"],
@@ -330,6 +359,7 @@ const ProfileHeader = memo(
             success={followStatus.status}
           />
         )}
+        {isUnfollowBoxOpen && <UnFollow user={user} avtar={avtar} closeHander={() => setIsUnfollowBoxOpen(false)} />}
         <div className="profile-picture">
           {isOwnProfile && (
             <div className="edit-profile-option" {...getRootProps()}>
@@ -367,7 +397,7 @@ const ProfileHeader = memo(
               ) : (
                 <>
                   {isFollowing ? (
-                    <button className="btn message-btn">
+                    <button className="btn message-btn" onClick={() => setIsUnfollowBoxOpen(true)}>
                       Following
                       <FontAwesomeIcon icon={faChevronDown} />
                     </button>

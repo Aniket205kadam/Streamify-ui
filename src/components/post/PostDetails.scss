@@ -229,6 +229,13 @@ $hover-background: #fafafa;
           cursor: pointer;
           padding: 8px;
 
+          .heart-container {
+            .svg-outline {
+              fill: black;
+              position: absolute;
+            }
+          }
+
           svg {
             font-size: 24px;
           }

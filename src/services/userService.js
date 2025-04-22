@@ -1,3 +1,5 @@
+import { data } from "react-router-dom";
+
 class userService {
   baseUrl = "http://localhost:8080/api/v1/users";
   mediaUrl = "http://localhost:8080/api/v1/media/users";
@@ -409,6 +411,45 @@ class userService {
     }
   }
 
+  async unfollowUser(unfollowingUserId, token, timeout = 1000) {
+    if (unfollowingUserId === "" || unfollowingUserId === null)
+      throw new Error("User ID is required for unfollow the user!");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/unfollow/${unfollowingUserId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.text(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
   async isFollowingUser(followingUserId, token, timeout = 10000) {
     if (followingUserId === "" || followingUserId === null)
       throw new Error("User ID is required for get following users!");
@@ -528,12 +569,46 @@ class userService {
     }
   }
 
-  async getFollowers(token, timeout = 10000) {
+  async getFollowings(username, token, timeout = 10000) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(`${this.baseUrl}/followings`, {
+      const response = await fetch(`${this.baseUrl}/${username}/followings`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.json();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getFollowers(username, token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    try {
+      const response = await fetch(`${this.baseUrl}/${username}/followers`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -671,6 +746,143 @@ class userService {
       return {
         success: true,
         status: response.status,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getNotification(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/notification/unseen", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.json();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async seenNotification(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/notification/seen", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          // Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async getSeenNotification(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/notification/n/seen", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      const json = await response.json();
+      return {
+        success: true,
+        status: response.status,
+        data: json,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        status: null,
+        error:
+          error.name === "AbortError" ? "Request timed out" : error.message,
+      };
+    }
+  }
+
+  async isUnseenNotificationPresent(token, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/v1/notification/is-unseens", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || `Error ${response.status}`);
+      }
+      return {
+        success: true,
+        status: response.status,
+        data: await response.text()
       };
     } catch (error) {
       return {

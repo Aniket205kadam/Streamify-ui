@@ -45,12 +45,16 @@ const Reels = () => {
         reelResponse.data.content.length === 0 && reelResponse.data.first
       );
       setIsLastPage(reelResponse.data.last);
-      console.log(reelResponse.data.content);
-      setReels((prevReels) =>
-        prevReels
-          ? [...prevReels, ...reelResponse.data.content]
-          : [...reelResponse.data.content]
-      );
+      setReels((prevReels) => {
+        const existingReels = prevReels || [];
+        const newReels = reelResponse.data.content;
+        const filteredNewReels = newReels.filter(
+          (newReel) => !existingReels.some((existing) => existing.id === newReel.id)
+        );
+      
+        return [...existingReels, ...filteredNewReels];
+      });
+      
       setLoading(false);
     })();
   }, [page]);
