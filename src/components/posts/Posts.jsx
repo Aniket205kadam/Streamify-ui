@@ -4,8 +4,9 @@ import PostPreview from "../post/PostPreview";
 import Loading from "../icons/Loading";
 import postService from "../../services/postService";
 import useAuthToken from "../../hooks/useAuthToken";
-import NotFoundTv from "../3D-componets/NotFoundTv"
+import NotFoundTv from "../3D-componets/NotFoundTv";
 import DogAnimation from "../3D-componets/dogAnimation";
+import { toast } from "react-toastify";
 
 function Posts() {
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,6 +19,7 @@ function Posts() {
   const [isLastPage, setIsLastPage] = useState(false);
   const authToken = useAuthToken();
   const [noPost, setNoPost] = useState(false);
+  const [suggestedPost, setSuggestedPost] = useState([]);
 
   const handleInfiniteScroll = async () => {
     if (
@@ -73,22 +75,45 @@ function Posts() {
     };
   }, []);
 
+  const fetchSuggestedPost = async () => {
+    const response = await postService.getSuggestedPost(authToken);
+    if (!response.success) {
+      toast.error("Failed to suggested post");
+      return;
+    }
+    setSuggestedPost(response.data);
+  };
+
+  useEffect(() => {
+    fetchSuggestedPost();
+  }, []);
+
   if (start) {
     return <h1>Loading...</h1>;
   }
 
-  // if (!start && noPost) {
-  //   return (
-  //     <div className="no-post">
-  //       <DogAnimation />
-  //     </div>
-  //   )
-  // }
+  if (!start && noPost) {
+    return (
+      <div className="posts">
+        <div className="msg">
+          <h2>Suggested for you</h2>
+          <p>
+            ✨ Your feed is feeling lonely! Start following users to see their
+            awesome posts. Discover stories, share vibes, and connect with your
+            community. 💬📸
+          </p>
+        </div>
+        {suggestedPost.map((post) => (
+          <PostPreview key={post.id} post={post} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="posts">
       {posts.map((post) => (
-          <PostPreview key={post.id} post={post} />
+        <PostPreview key={post.id} post={post} />
       ))}
       {!isLastPage && loading && <Loading top={80} />}
     </div>

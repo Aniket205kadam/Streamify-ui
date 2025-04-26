@@ -2,4 +2,14 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    .msg {
+      padding: 20px;
+      padding-top: 30px;
+
+      h2 {
+        padding-bottom: 20px;
+        color: #352d2d;
+      }
+    }
   }
